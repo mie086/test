@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ms">
 <head>
@@ -25,159 +26,33 @@
             padding: 0;
         } 
         
-        /* ===========================
-           GLOBAL LAYOUT & SCALING
-           =========================== */
-        
-        /* 1) Global: body/html tidak scroll — hanya #mobile-content scroll */
-        html, body {
-          height: 100%;
-          margin: 0;
-          padding: 0;
-          overflow: hidden;         /* TIADA scrollbar luaran */
-          background: #0f1720;      /* padankan latar aplikasi */
-        }
-        
-        /* 2) Root variables */
-        :root {
-          --frame-w: 480px;
-          --frame-radius: 16px;
-          --scale: 1;               /* fallback, akan ditetapkan semula di media query */
-        }
-        
-        /* 3) Desktop / normal frame (mockup 480px) */
+        /* Phone Frame + Auto Scale */
         #mobile-wrapper {
-          width: var(--frame-w);
-          height: 100vh;
-          background-color: #0f1720; /* gunakan warna gelap di luar, kandungan card ada warna sendiri */
-          box-shadow: 0 0 30px rgba(0,0,0,0.45);
-          border-radius: var(--frame-radius);
-          overflow: hidden;         /* kandungan dalaman discroll oleh #mobile-content */
-          position: relative;
-          transform-origin: top center;
-          margin: 0 auto;           /* centre pada desktop */
-        }
-        
-        /* 4) Inner content = tempat scroll sebenar */
-        #mobile-content {
-          height: 100%;
-          width: 100%;
-          box-sizing: border-box;
-          overflow-y: auto;              /* only this scrolls */
-          overflow-x: hidden;
-          -webkit-overflow-scrolling: touch;
-        }
-        
-        /* ===========================
-           MOBILE: auto-scale supaya frame muat penuh
-           =========================== */
-        @media (max-width: 480px) {
-          :root {
-            /* hadkan max scale pada 1; jika screen lebih kecil, scale = 100vw / 480 */
-            --scale: calc(min(100vw / var(--frame-w), 1));
-          }
-        
-          /* Make frame fixed and scale so that visual area becomes full-bleed */
-          #mobile-wrapper {
-            position: fixed;
-            top: 0;
-            left: 50%;
-            width: var(--frame-w);
-            height: calc(100vh / var(--scale));   /* supaya after scale => 100vh */
+            width: 480px;               /* FIXED width – paling penting */
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #1e293b;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
             transform-origin: top center;
-            transform: translateX(-50%) scale(var(--scale));
-            border-radius: 0;                      /* full-bleed look on phones (optional) */
-            overflow: hidden;
-          }
-        
-          /* inner scroll still active */
-          #mobile-content {
-            width: 100%;
-            overflow-y: auto;
-            overflow-x: hidden;
-          }
         }
         
-        /* ===========================
-           SCROLLBAR STYLING (Inner scroll) — WebKit browsers
-           =========================== */
-        #mobile-content::-webkit-scrollbar {
-          width: 10px;
+        /* AUTO SCALE untuk semua skrin kecil */
+        @media (max-width: 480px) {
+            #mobile-wrapper {
+                transform: scale(calc(100vw / 480)); /* skala layout */
+            }
         }
-        #mobile-content::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        #mobile-content::-webkit-scrollbar-thumb {
-          background: rgba(255,255,255,0.12);
-          border-radius: 8px;
-          border: 2px solid rgba(0,0,0,0.1);
-        }
-        
-        /* Optional: scrollbar for Firefox */
-        @-moz-document url-prefix() {
-          #mobile-content {
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255,255,255,0.12) transparent;
-          }
-        }
-        
-        /* ===========================
-           SCROLL-TO-TOP BUTTON (inside #mobile-wrapper)
-           - position absolute relative to wrapper
-           - compensate for wrapper scale: divide offsets by var(--scale)
-           - undo scale for button contents: scale(1/var(--scale))
-           =========================== */
-        
-        #mobile-wrapper #scrollToTopBtn {
-          position: absolute; /* relative to wrapper */
-          right: calc(20px / var(--scale, 1)); 
-          /* visual bottom distance = 60px; divide by scale so final visual bottom = 60px */
-          bottom: calc((60px + env(safe-area-inset-bottom, 0px)) / var(--scale, 1));
-          z-index: 999;
-          opacity: 0;
-          pointer-events: none;
-          width: 52px;
-          height: 52px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 999px;
-          box-shadow: 0 6px 18px rgba(2,6,23,0.4);
-          transition: transform 0.22s ease, opacity 0.22s ease;
-          transform-origin: bottom right;
-          /* undo parent scale so button size remains constant visually */
-          transform: scale(calc(1 / var(--scale, 1))) translateY(12px);
-          background: linear-gradient(180deg, #3b82f6, #2563eb);
-          color: #fff;
-          border: none;
-        }
-        
-        /* Show state */
-        #mobile-wrapper #scrollToTopBtn.show {
-          opacity: 1;
-          pointer-events: auto;
-          transform: scale(calc(1 / var(--scale, 1))) translateY(0);
-        }
-        
-        /* Hover / Active */
-        #mobile-wrapper #scrollToTopBtn:hover {
-          transform: scale(calc(1 / var(--scale, 1))) translateY(-6px);
-        }
-       
-        /* Glass panel */
+
         .glass-panel {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
-        /* Ocean gradient background */
         .bg-ocean {
             background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
             color: white;
         }
-        
-        /* Input kecil */
         .edit-input {
             width: 80px;
             padding: 4px;
@@ -195,38 +70,21 @@
         }
         
         /* Scroll To Top Button: Position fixed relative to mobile wrapper */
-        #mobile-wrapper #scrollToTopBtn {
-          position: absolute;                 /* relatif kepada #mobile-wrapper */
-          /* Compensate for wrapper scale: visualRight = right * scale, so divide by scale */
-          right: calc(20px / var(--scale, 1)); 
-          bottom: calc((60px + env(safe-area-inset-bottom, 0px)) / var(--scale, 1));
-          z-index: 999;
-          opacity: 0;
-          pointer-events: none;
-          transform-origin: bottom right;
-          /* Undo wrapper scale so ikon butang tidak ikut mengecil/membesar */
-          transform: scale(calc(1 / var(--scale, 1))) translateY(12px);
-          transition: transform 0.22s ease, opacity 0.22s ease;
-          /* saiz tetap (jika anda mahu) */
-          width: 52px;
-          height: 52px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 999px;
+        #scrollToTopBtn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px; /* Aligned to the viewport */
+            z-index: 99;
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
         }
         
-        /* Show state */
-        #mobile-wrapper #scrollToTopBtn.show {
-          opacity: 1;
-          pointer-events: auto;
-          transform: scale(calc(1 / var(--scale, 1))) translateY(0);
-        }
-        
-        /* Hover / pressed tweak (visual only) */
-        #mobile-wrapper #scrollToTopBtn:active,
-        #mobile-wrapper #scrollToTopBtn:hover {
-          transform: scale(calc(1 / var(--scale, 1))) translateY(-6px);
+        #scrollToTopBtn.show {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
         }
 
         /* Sidebar Transition */
@@ -254,32 +112,6 @@
         .slider-image.active {
             opacity: 1;
         }
-
-        /* Slider Navigation Buttons */
-        .slider-nav-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.4);
-            color: white;
-            border: none;
-            padding: 10px 14px;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.3s;
-            backdrop-filter: blur(5px);
-            border-radius: 9999px; /* Fully rounded */
-        }
-        .slider-nav-btn:hover {
-            background: rgba(0, 0, 0, 0.7);
-            transform: translateY(-50%) scale(1.05);
-        }
-        .slider-nav-btn.left {
-            left: 10px;
-        }
-        .slider-nav-btn.right {
-            right: 10px;
-        }
         
         /* FIX: Ensure content inside Top Stat cards is aligned and clean */
         .stat-content {
@@ -297,6 +129,62 @@
         .stat-card-link:hover {
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
             transform: translateY(-3px);
+        }
+        
+        /* POPUP OVERLAY */
+        #popup-warning-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: transparent;   /* TIADA lagi hitam gelap */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: none;     /* tiada blur */
+        }
+        
+        /* POPUP BOX */
+        #popup-warning-box {
+            background: #ffffff;
+            width: 90%;
+            max-width: 400px;
+            padding: 20px 24px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            font-family: 'Inter', sans-serif;
+        }
+        
+        #popup-warning-box h2 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            color: #1e293b;
+            font-weight: 700;
+        }
+        
+        #popup-warning-box p {
+            color: #334155;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.4rem;
+        }
+        
+        #popup-warning-button {
+            background: #0ea5e9;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        #popup-warning-button:active {
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -387,9 +275,7 @@
     </div>
     
     <!-- WRAPPER FOR MOBILE SCREEN RESOLUTION (Restored) -->
-    <body>
-    <div id="mobile-wrapper">
-      <div id="mobile-content">
+    <div id="mobile-wrapper" class="relative">
 
         <!-- Navbar / Header -->
         <nav class="bg-gradient-to-r from-slate-900 via-blue-900 to-emerald-900 text-white p-4 shadow-lg sticky top-0 z-50 border-b border-blue-800/50 backdrop-blur-md bg-opacity-90">
@@ -439,14 +325,6 @@
                 <img class="slider-image" src="images/candat3.jpg" alt="Candat 3">
                 <img class="slider-image" src="images/candat4.jpg" alt="Candat 4">
                 <img class="slider-image" src="images/candat5.jpg" alt="Candat 5">
-
-                <!-- Navigation Buttons -->
-                <button class="slider-nav-btn left" onclick="changeSlide(-1)">
-                    <i class="fa-solid fa-chevron-left text-lg"></i>
-                </button>
-                <button class="slider-nav-btn right" onclick="changeSlide(1)">
-                    <i class="fa-solid fa-chevron-right text-lg"></i>
-                </button>
             </div>
             <!-- END NEW: Image Slider Section -->
 
@@ -532,6 +410,18 @@
                 </div>
             </div>
             <!-- END NEW SHORTCUT ROW -->
+
+            <!-- POPUP WARNING -->
+            <div id="popup-warning-overlay" style="display:none;">
+                <div id="popup-warning-box">
+                    <h2>PESANAN:</h2>
+                    <p>
+                        Untuk paparan terbaik, sila <strong>zoom in atau zoom out</strong> 
+                        kerana halaman ini masih dalam versi beta. Terima Kasih.
+                    </p>
+                    <button id="popup-warning-button">Saya Faham</button>
+                </div>
+            </div>
 
             <!-- COMBINED SECTION: Pengenalan & Misi (Replaces old #introSection) -->
             <div id="introMissionSection" class="glass-panel rounded-2xl shadow-lg border-t-4 border-purple-500 relative overflow-hidden scroll-mt-28">
@@ -973,11 +863,11 @@
                                     
                                     <div class="grid grid-cols-2 gap-2">
                                         <div class="bg-gray-50 p-2 rounded-lg text-center border border-gray-100">
-                                            <span class="block text-[9px] text-gray-400 uppercase">Bayar Sebulan:</span>
+                                            <span class="block text-[9px] text-gray-400 uppercase">Simpan Bulanan Untuk Capai Target</span>
                                             <span id="calcMonthly" class="block text-sm font-bold text-emerald-600">RM 0</span>
                                         </div>
                                         <div class="bg-gray-50 p-2 rounded-lg text-center border border-gray-100">
-                                            <span class="block text-[9px] text-gray-400 uppercase">Bayar Sehari:</span>
+                                            <span class="block text-[9px] text-gray-400 uppercase">Simpan Mingguan Untuk Capai Target</span>
                                             <span id="calcWeekly" class="block text-sm font-bold text-blue-600">RM 0</span>
                                         </div>
                                     </div>
@@ -1289,12 +1179,9 @@
         </div>
     </div> <!-- END OF MOBILE WRAPPER -->
 
-    <!-- SCROLL TO TOP BUTTON (letak di dalam wrapper untuk kedudukan relatif) -->
-    <button id="scrollToTopBtn" aria-label="Scroll to top">
-      <!-- gunakan icon font / SVG yang anda ada -->
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M12 5l-7 7h4v7h6v-7h4l-7-7z" fill="currentColor"/>
-      </svg>
+    <!-- SCROLL TO TOP BUTTON -->
+    <button id="scrollToTopBtn" onclick="scrollToTop()" class="bg-blue-600 text-white p-3 rounded-full shadow-lg flex items-center justify-center backdrop-blur-sm border border-blue-400/30 hover:bg-blue-500 hover:-translate-y-1">
+        <i class="fa-solid fa-arrow-up"></i>
     </button>
 
     <!-- NEW MODAL: Payment Details -->
@@ -1437,11 +1324,9 @@
             { url: "images/candat1.jpg", alt: "Candat 1" },
             { url: "images/candat2.jpg", alt: "Candat 2" },
             { url: "images/candat3.jpg", alt: "Candat 3" },
-            { url: "images/candat4.jpg", alt: "Candat 4" },
-            { url: "images/candat5.jpg", alt: "Candat 5" }
+            { url: "images/candat4.jpg", alt: "Candat 4" }
         ];
         let currentImageIndex = 0;
-        let slideInterval; // Variable untuk menampung interval automatik
 
 
         // --- MOCK DATA (UPDATED WITH HISTORY PROPERTY) ---
@@ -1466,6 +1351,17 @@
             { id: 103, date: '2025-02-06', category: 'Pengangkutan', detail: 'Bayar Booking (Full)', amount: 190 }
         ];
 
+        // --- Pop Up(new) ---
+        document.addEventListener("DOMContentLoaded", function () {
+            // Buka popup setiap kali halaman dibuka/refresh
+            document.getElementById("popup-warning-overlay").style.display = "flex";
+        
+            // Tutup popup bila tekan butang
+            document.getElementById("popup-warning-button").onclick = function () {
+                document.getElementById("popup-warning-overlay").style.display = "none";
+            };
+        });
+
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             updateCountdown();
@@ -1480,49 +1376,27 @@
         });
 
         // --- IMAGE SLIDER LOGIC ---
-        
-        // Fungsi untuk menukar imej ke indeks tertentu
-        function goToSlide(index) {
-            const images = document.querySelectorAll('.image-slider .slider-image');
-            if (images.length === 0) return;
+        function updateSliderImage() {
+            const images = document.querySelectorAll('.slider-image');
             
-            // Keluarkan kelas 'active' dari imej semasa
-            images[currentImageIndex].classList.remove('active');
+            // Fade out current active image
+            images.forEach((img, index) => {
+                if (img.classList.contains('active')) {
+                    img.classList.remove('active');
+                }
+            });
+
+            currentImageIndex = (currentImageIndex + 1) % images.length;
             
-            // Kira indeks baru (pastikan ia berada dalam julat)
-            currentImageIndex = (index + images.length) % images.length;
-            
-            // Tambah kelas 'active' pada imej baru
+            // Fade in the new active image
             images[currentImageIndex].classList.add('active');
         }
 
-        // Fungsi untuk menukar slide berdasarkan arah (+1 atau -1)
-        function changeSlide(direction) {
-            // Hentikan auto-slide buat sementara waktu
-            clearInterval(slideInterval); 
-            
-            // Tukar slide
-            const newIndex = currentImageIndex + direction;
-            goToSlide(newIndex);
-            
-            // Mulakan semula auto-slide selepas jeda interaksi
-            slideInterval = setInterval(() => goToSlide(currentImageIndex + 1), 5000);
-        }
-
-        // Fungsi untuk mengemaskini slide secara automatik
-        function updateSliderImage() {
-            goToSlide(currentImageIndex + 1);
-        }
-
         function startImageSlider() {
+            // Populate slider with data from JS array
             const sliderContainer = document.querySelector('.image-slider');
             if (sliderContainer) {
-                 // Gantikan semua elemen dalam sliderContainer (kecuali butang)
-                 // Ini memastikan imej dari array JS digunakan, bukan HTML mock up
-                 const navButtons = sliderContainer.querySelectorAll('.slider-nav-btn');
                  sliderContainer.innerHTML = '';
-                 
-                 // Masukkan imej
                  sliderImages.forEach((imgData, index) => {
                     const img = document.createElement('img');
                     img.className = 'slider-image';
@@ -1536,13 +1410,10 @@
                     if (index === 0) img.classList.add('active');
                     sliderContainer.appendChild(img);
                  });
-                 
-                 // Masukkan semula butang navigasi (jika ada)
-                 navButtons.forEach(btn => sliderContainer.appendChild(btn));
             }
 
-            // Mulakan auto-slide
-            slideInterval = setInterval(updateSliderImage, 5000); // Ganti setiap 5 saat
+            // Start the auto change timer
+            setInterval(updateSliderImage, 5000); // Ganti setiap 5 saat
         }
 
 
@@ -1574,17 +1445,9 @@
         
         // Custom function to handle Home link (used by menu and squid icon)
         function scrollToTopAndCloseMenu() {
-            // Scroll to top inside mobile-content
-            const scrollArea = document.getElementById('mobile-content');
-        
-            if (scrollArea) {
-                scrollArea.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        
-            // Tutup menu terus
-            toggleMenu();
+            scrollToTop();
+            // Wait for scroll to finish before closing menu for smoother UX
+            setTimeout(toggleMenu, 300);
         }
 
         // --- TIME LOGIC ---
@@ -1644,24 +1507,19 @@
         }
 
         // --- SCROLL TO TOP LOGIC ---
-        document.addEventListener('DOMContentLoaded', function () {
-          const scrollBtn = document.getElementById('scrollToTopBtn');
-          const scrollArea = document.getElementById('mobile-content');
+        const scrollBtn = document.getElementById('scrollToTopBtn');
         
-          if (!scrollBtn || !scrollArea) return;
-        
-          // Toggle visibility on inner scroll
-          scrollArea.addEventListener('scroll', () => {
-            if (scrollArea.scrollTop > 300) scrollBtn.classList.add('show');
-            else scrollBtn.classList.remove('show');
-          }, { passive: true });
-        
-          // Click handler
-          scrollBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            scrollArea.scrollTo({ top: 0, behavior: 'smooth' });
-          });
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollBtn.classList.add('show');
+            } else {
+                scrollBtn.classList.remove('show');
+            }
         });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         // --- MEMBERS TABLE & STATS ---
         function renderTable() {
@@ -2145,58 +2003,52 @@
             }, 10);
         }
 
+        // Override default browser functions (Critical Mandate)
+        window.alert = (message) => showStatusModal("Notifikasi", message, "info");
 
 
-        // --- CALCULATOR LOGIC (DAILY & MONTHLY with guaranteed 2 decimals + explanation) ---
+        // --- CALCULATOR LOGIC (UPDATED WITH SUGGESTION) ---
         function calculateSavings() {
             const currentSavings = parseFloat(document.getElementById('calcCurrentSavings').value) || 0;
-            const paidAmount = parseFloat(document.getElementById('calcPaidAmount').value) || 0;
-        
+            const paidAmount = parseFloat(document.getElementById('calcPaidAmount').value) || 0; // Ambil nilai yang dah dibayar
+            
+            // Formula Baru: Target - (Duit Tangan + Duit Dah Bayar)
             const totalAssets = currentSavings + paidAmount;
             const needed = Math.max(0, TARGET_PER_PERSON - totalAssets);
-        
+            
             document.getElementById('calcNeeded').innerText = formatCurrency(needed);
-        
+
             const timeData = getRemainingTime();
-        
+            
             const suggestionBox = document.getElementById('calcSuggestion');
             const suggestionText = document.getElementById('calcSuggestionText');
-        
+
             if (timeData.expired || needed <= 0) {
-                document.getElementById('calcMonthly').innerText = formatCurrencyFixed(0);
-                document.getElementById('calcWeekly').innerText = formatCurrencyFixed(0);
-                suggestionBox.classList.add('hidden');
-        
-                if (needed <= 0) {
-                    suggestionBox.classList.remove('hidden');
-                    suggestionText.innerText = `Mantap! Target bayaran anda (RM ${TARGET_PER_PERSON}) sudah dicapai!`;
-                    suggestionBox.classList.remove('bg-indigo-50');
-                    suggestionBox.classList.add('bg-emerald-50');
-                }
-                return;
+                 document.getElementById('calcMonthly').innerText = "RM 0";
+                 document.getElementById('calcWeekly').innerText = "RM 0";
+                 
+                 suggestionBox.classList.add('hidden');
+                 if(needed <= 0) {
+                     suggestionBox.classList.remove('hidden');
+                     suggestionText.innerText = `Mantap! Target bayaran anda (RM ${TARGET_PER_PERSON}) sudah dicapai!`;
+                     suggestionBox.classList.remove('bg-indigo-50');
+                     suggestionBox.classList.add('bg-emerald-50');
+                 }
+                 return;
             }
-        
-            const daysLeft = Math.max(1, Math.ceil(timeData.totalDays));
-            const rawDaily = needed / daysLeft;                 // contoh: 291 / 150 = 1.94...
-            const dailyTwo = parseFloat(rawDaily.toFixed(2));   // 2 dp value (1.94)
-            const dailyCeil = Math.ceil(rawDaily);              // rounded up (2)
-        
-            const monthsLeft = Math.max(1, timeData.displayMonths);
-            const rawMonthly = needed / (monthsLeft || 1);
-            const monthlyTwo = parseFloat(rawMonthly.toFixed(2)); // 2 dp value (e.g. 72.75)
-        
-            document.getElementById('calcMonthly').innerText = formatCurrencyFixed(monthlyTwo);
-            document.getElementById('calcWeekly').innerText = formatCurrencyFixed(dailyTwo);
-        
+
+            // Using total days for a more accurate calculation
+            const weeksLeft = Math.max(1, Math.ceil(timeData.totalDays / 7));
+            const weeklyPayment = needed / weeksLeft;
+            const monthsLeft = Math.max(1, timeData.displayMonths); // Use display months for cleaner rounding
+            const monthlyPayment = needed / (monthsLeft || 1);
+
+            document.getElementById('calcMonthly').innerText = formatCurrency(monthlyPayment);
+            document.getElementById('calcWeekly').innerText = formatCurrency(weeklyPayment);
+            
             suggestionBox.classList.remove('hidden');
-            suggestionBox.classList.add('bg-indigo-50');
-        
-            suggestionText.innerText = `Tips: Bayar ${formatCurrencyFixed(dailyTwo)} sehari dari sekarang untuk capai target dalam ${daysLeft} hari.`;
-        }
-        
-        function formatCurrencyFixed(amount) {
-            const num = Number.isFinite(amount) ? amount : 0;
-            return 'RM ' + num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            suggestionBox.classList.add('bg-indigo-50'); // Ensure background is correct for saving
+            suggestionText.innerText = `Tips: Simpan RM${Math.ceil(weeklyPayment)} seminggu dari sekarang untuk capai target dalam ${weeksLeft} minggu.`;
         }
 
         // --- ADMIN / MODALS LOGIC ---
@@ -2399,10 +2251,5 @@
         }
 
     </script>
-      <header class="fixed-inside"> ... </header>
-      <main> ... panjang content ... </main>
-      <footer> ... </footer>
-    </div>
-  </div>
 </body>
 </html>
