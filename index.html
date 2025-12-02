@@ -127,21 +127,30 @@
         }
         
         /* Scroll To Top Button: Position fixed relative to mobile wrapper */
-        #scrollToTopBtn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px; /* Aligned to the viewport */
-            z-index: 99;
-            transition: all 0.3s ease;
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(20px);
+        #mobile-wrapper #scrollToTopBtn {
+          position: absolute;                 /* relative kepada #mobile-wrapper */
+          right: 20px;                        /* jarak dari tepi frame */
+          bottom: calc(30px + env(safe-area-inset-bottom, 0px)); /* safe area */
+          z-index: 999;
+          opacity: 0;
+          pointer-events: none;
+          transform-origin: bottom right;     /* supaya pembatalan scale nampak kemas */
+          transition: transform 0.25s ease, opacity 0.25s ease;
+          /* butang tidak akan di-scale oleh transform-skala wrapper (undo scale) */
+          /* NOTE: var(--scale) mesti wujud; jika tidak, set --scale:1 sebagai fallback */
+          transform: scale(calc(1 / var(--scale, 1))) translateY(12px);
         }
         
-        #scrollToTopBtn.show {
-            opacity: 1;
-            pointer-events: all;
-            transform: translateY(0);
+        /* Tunjuk butang */
+        #mobile-wrapper #scrollToTopBtn.show {
+          opacity: 1;
+          pointer-events: auto;
+          transform: scale(calc(1 / var(--scale, 1))) translateY(0);
+        }
+        
+        /* kecilkan kesan 'hover -> translate' utility (Tailwind class gantikan) */
+        #mobile-wrapper #scrollToTopBtn:hover {
+          transform: scale(calc(1 / var(--scale, 1))) translateY(-6px);
         }
 
         /* Sidebar Transition */
@@ -1205,8 +1214,8 @@
     </div> <!-- END OF MOBILE WRAPPER -->
 
     <!-- SCROLL TO TOP BUTTON -->
-    <button id="scrollToTopBtn" onclick="scrollToTop()" class="bg-blue-600 text-white p-3 rounded-full shadow-lg flex items-center justify-center backdrop-blur-sm border border-blue-400/30 hover:bg-blue-500 hover:-translate-y-1">
-        <i class="fa-solid fa-arrow-up"></i>
+    <button id="scrollToTopBtn" class="no-scale bg-blue-600 text-white p-3 rounded-full shadow-lg flex items-center justify-center backdrop-blur-sm border border-blue-400/30 hover:bg-blue-500 hover:-translate-y-1" aria-label="Scroll to top">
+      <i class="fa-solid fa-arrow-up"></i>
     </button>
 
     <!-- NEW MODAL: Payment Details -->
