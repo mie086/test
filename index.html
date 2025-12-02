@@ -25,39 +25,75 @@
             padding: 0;
         } 
         
-        /* DESKTOP MODE (Normal 480px frame) */
-        #mobile-wrapper {
-            width: 480px;
-            height: 100vh;
-            background-color: #1e293b;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-            border-radius: 16px;
-            overflow: hidden;
-            position: relative;
-            transform-origin: top center;
+        /* ---------- BASE (Desktop) ---------- */
+        :root {
+          --frame-w: 480px;
         }
         
-        /* MOBILE MODE – Auto scale tanpa scroll kiri/kanan */
+        /* Desktop / normal frame */
+        #mobile-wrapper {
+          width: var(--frame-w);
+          height: 100vh;                 /* Tinggi layout reka bentuk */
+          background-color: #1e293b;
+          box-shadow: 0 0 30px rgba(0,0,0,0.5);
+          border-radius: 16px;
+          overflow: hidden;              /* kandungan dalam skrol sendiri */
+          position: relative;
+          transform-origin: top center;
+          margin: 0 auto;
+        }
+        
+        /* Inner container — tempat kandungan sebenar; boleh discroll secara menegak */
+        #mobile-content {
+          height: 100%;
+          overflow-y: auto;              /* scroll dalaman di sini */
+          -webkit-overflow-scrolling: touch;
+        }
+        
+        /* ---------- MOBILE: auto-scale tanpa ruang kosong / no horizontal scroll ---------- */
         @media (max-width: 480px) {
-            html, body {
-                margin: 0;
-                padding: 0;
-                overflow-x: hidden !important;   /* pastikan tiada scroll-x */
-                width: 100%;
-            }
+          html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;            /* pastikan body tidak buat scroll-x */
+            background: #0f1720;         /* letakkan warna latar sama / padankan supaya tak nampak 'gap' */
+          }
         
-            #mobile-wrapper {
-                position: absolute;
-                top: 0;
-                left: 50%;
+          /* tetapkan pembolehubah skala; hadkan kepada 1 (jangan zoom lebih besar daripada asli) */
+          :root {
+            --scale: calc(min(100vw / var(--frame-w), 1));
+          }
         
-                /* Scale ikut lebar skrin */
-                transform: translateX(-50%) scale(calc(100vw / 480));
+          /* Jadikan frame fixed supaya selalu berada di atas skrin, dan ketinggian disesuaikan supaya selepas scale = 100vh */
+          #mobile-wrapper {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            width: var(--frame-w);
+            /* penting: ketinggian sebenar sebelum scale supaya selepas scale menjadi 100vh */
+            height: calc(100vh / var(--scale));
+            transform-origin: top center;
+            transform: translateX(-50%) scale(var(--scale));
+            border-radius: 0; /* optional: hilangkan corner jika mahu tampak seperti full-bleed di phone */
+            overflow: hidden;
+          }
         
-                /* Kunci saiz asal supaya scale bekerja betul */
-                width: 480px;
-                height: 100vh;
-            }
+          /* Pastikan tiada overflow-x dari dalam */
+          #mobile-content {
+            width: 100%;
+            box-sizing: border-box;
+            overflow-y: auto;
+            overflow-x: hidden;
+          }
+        
+          /* Jika ada header / fixed elements dalam frame, pastikan mereka tidak 'outside' */
+          /* Contoh: header yang fixed di dalaman frame */
+          #mobile-wrapper .fixed-inside {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+          }
         }
         
         /* Glass panel */
@@ -266,7 +302,10 @@
     </div>
     
     <!-- WRAPPER FOR MOBILE SCREEN RESOLUTION (Restored) -->
-    <div id="mobile-wrapper" class="relative">
+    <body>
+      <div id="mobile-wrapper">
+        <div id="mobile-content">
+
 
         <!-- Navbar / Header -->
         <nav class="bg-gradient-to-r from-slate-900 via-blue-900 to-emerald-900 text-white p-4 shadow-lg sticky top-0 z-50 border-b border-blue-800/50 backdrop-blur-md bg-opacity-90">
@@ -2254,5 +2293,10 @@
         }
 
     </script>
+      <header class="fixed-inside"> ... </header>
+      <main> ... panjang content ... </main>
+      <footer> ... </footer>
+    </div>
+  </div>
 </body>
 </html>
