@@ -1,0 +1,122 @@
+﻿Time Zone : Asia/Kuala_Lumpur
+Chat Started : Wed, 26 Nov 2025 09:14:40
+
+
+(Wed, 26 Nov 2025 09:14:40) Aisha : Welcome to Pos Malaysia. I'm Aisha, your virtual assistant. 😃 How can I help 
+you?
+
+(Wed, 26 Nov 2025 09:14:40) Aisha : Card: Please select from the options below: Parcel Support, Customs Enquiries, 
+Business Enquiries, FAQs, More Options, Switch Language
+
+(Wed, 26 Nov 2025 09:14:46) muhammad fahmie bin mat refi : Parcel Support
+TextPostBack: Parcel Support
+
+(Wed, 26 Nov 2025 09:14:46) Aisha : To track your parcel please type in your tracking number (without any spaces or 
+special characters!)
+
+(Wed, 26 Nov 2025 09:14:58) muhammad fahmie bin mat refi : RY502518383MY
+
+(Wed, 26 Nov 2025 09:15:02) Aisha : Tracking Status: ON THE WAY - Transfer in progress Process Summary: Your parcel 
+is being transported to the next facility Office Name: PUSAT MEL NASIONAL
+
+(Wed, 26 Nov 2025 09:15:07) Aisha : Card: Was I able to help you? Yes, No
+
+(Wed, 26 Nov 2025 09:17:26) muhammad fahmie bin mat refi : No
+TextPostBack: No
+
+(Wed, 26 Nov 2025 09:17:28) Aisha : Sorry if I wasn’t as helpful as I could’ve been. 
+
+(Wed, 26 Nov 2025 09:17:28) Aisha : FeedbackForm: NotSubmitted 
+
+(Wed, 26 Nov 2025 09:17:28) Aisha : Card: I'll connect you with my colleague who can assist you further. 
+Yes,please, No, thanks. I'll manage
+
+(Wed, 26 Nov 2025 09:17:35) muhammad fahmie bin mat refi : Yes,please
+TextPostBack: Yes,please
+
+(Wed, 26 Nov 2025 09:17:40) Aisha : Before I connect you to my colleage, I just need a few details from you.
+
+(Wed, 26 Nov 2025 09:17:42) Aisha : ContactDetailsForm: 
+Contact Details
+
+
+(Wed, 26 Nov 2025 09:18:04) muhammad fahmie bin mat refi : Done
+ContactDetailsPostBack: NAME:muhammad fahmie bin mat refi 
+EMAIL:mie86takumi@gmail.com PHONE_NO:01116618454
+
+(Wed, 26 Nov 2025 09:18:05) Aisha : 
+Alright! My colleague will be with you shortly.
+
+
+(Wed, 26 Nov 2025 09:18:34) AskPos : Hi,Fahmie . Hanan here. How can I assist you? 
+
+(Wed, 26 Nov 2025 09:19:23) muhammad fahmie bin mat refi : saya ingin bertanya mengenai no tracking ini RY502518383MY, kenapa saya track 
+mengatakan sudah sampai, tetapi saya tidak menerimanya
+
+(Wed, 26 Nov 2025 09:20:20) muhammad fahmie bin mat refi : saya wakil daripada pejabat mail PPUM yang menerima surat dari POS MALAYSIA 
+untuk d sorting kepada jabatan-jabatyan di seluruh PPUM
+
+(Wed, 26 Nov 2025 09:21:53) AskPos : Setelah diteliti, item anda RY502518383MY telah berjaya dihantar ke alamat 
+penerima pada 17/11/2025. Sila semak item anda di peti surat, pondok pengawal, 
+atau bilik surat dalam kawasan kediaman anda untuk item tersebut.
+
+(Wed, 26 Nov 2025 09:22:08) AskPos : Adakah anda telah lakukan semakan di tempat berkenaan? 
+
+(Wed, 26 Nov 2025 09:23:29) muhammad fahmie bin mat refi : sudah, kebiasaanya wakil pos malaysia akan hantar surat dalam kuantiti yang 
+banyak tetapi selama sebulan kami tidak menerima apa2 surat daripada pejabat 
+pos surat berdaftar atau tidak berdaftar
+
+(Wed, 26 Nov 2025 09:23:52) muhammad fahmie bin mat refi : boleh cik hanan kongsikan gmabar bukti yang mengatakan sudah dihantar?
+
+(Wed, 26 Nov 2025 09:24:10) muhammad fahmie bin mat refi : kebiasaanya pihak kami akan mengecop tanda terima
+
+(Wed, 26 Nov 2025 09:25:11) AskPos : Kami memohon maaf atas sebarang kesulitan yang berlaku. Seperti pada sistem, 
+status menunjukkan bahawa item telah berjaya dihantar. Namun, jika anda masih 
+tidak menerima item tersebut, saya akan bantu untuk membuka laporan dan kami 
+akan menjalankan semakan lanjut bagi item ini. Untuk meneruskan, sila berikan 
+maklumat berikut. Nombor tracking: Nama Penuh Penerima: Nombor Telefon 
+Penerima: Alamat Penerima: Kandungan item: Kuantiti:
+
+(Wed, 26 Nov 2025 09:28:18) muhammad fahmie bin mat refi : saya tidak pasti nama penuh penerima dan nombor telefon sebab saya hanya wakil 
+dari jabatan yang ingin bertanya tentang surat mereka
+
+(Wed, 26 Nov 2025 09:28:26) muhammad fahmie bin mat refi : saya hanya boleh bagi no tracking sahaja
+
+(Wed, 26 Nov 2025 09:29:18) AskPos : Mohon maaf Fahmie, kami perlukan maklumat lengkap untuk teruskan dengan laporan 
+untuk item ini.
+
+(Wed, 26 Nov 2025 09:29:41) muhammad fahmie bin mat refi : ini bukan kali pertama perkara ini berlaku
+
+(Wed, 26 Nov 2025 09:30:52) muhammad fahmie bin mat refi : ini salah satu contoh bukti untuk kami cop tanda kami menerima surat
+Image: Image: 
+https://storage.googleapis.com/prod8-spr-livechat-secure/chat/90190/app_9046265/6926584b50d50a1ffb5d1dc9/WhatsApp_20Image_202025-11-26_.jpeg?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=prod8-gcs-sa%40gc-prod8.iam.gserviceaccount.com%2F20251126%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20251126T014631Z&X-Goog-Expires=300&X-Goog-SignedHeaders=host&X-Goog-Signature=2f2ac539df7f4cae3b99ef9c7be6aaa986ef9b2082d6a54960cb1d43978e3fb6d73715f0bde56c405426314fcd11dfdbab2cd0157c32f57769f4ff0058cbda2a2c6048948a3dde9ce31b570f048097faca0d6230ab8ddcc750dfd57da0d8685f8437afa7f26724b5ab70f9e5e1882882b52cdbef6165f7a639b7739608b64a6b4897192930831151c6884262490b9819ab21b7f68c132b9fffd7b0a45b683e60ad671f38d79ca9db79eb3544da909502b62eefca0a14412b3ad8110c90b1eac20a562ed9abe09d853d7d51686228f0dd75c49690a98e7b445f57dacf15f6d9220bc6bd9161af5be08adc3efa273e3b01d35f89f1401d0ed641feaead60cd95da
+
+(Wed, 26 Nov 2025 09:31:12) muhammad fahmie bin mat refi : last surat sampai pada kami 23/10/2025
+
+(Wed, 26 Nov 2025 09:31:33) muhammad fahmie bin mat refi : bagaimana pula dengan surat yang tidak berdaftar? bagaimana kami nak track?
+
+(Wed, 26 Nov 2025 09:33:02) AskPos : Untuk teruskan dengan laporan, kami perlu dapatkan maklumat lengkap penerima. 
+Boleh anda buat pertanyaan dahulu kepada pemilik surat berkenaan?
+
+(Wed, 26 Nov 2025 09:34:17) muhammad fahmie bin mat refi : baiklah saya akan dapatkan dahulu maklumat mereka, tetapi boleh cik hanan 
+kongsikan gambar bukti tanda sudah hantar, kebiasaanya pos malaysia akan povide 
+bukti gamabr
+
+(Wed, 26 Nov 2025 09:38:18) AskPos : Kami mohon maaf, kami tidak dapat akses untuk berikan gambar bukti pengeposan 
+kerana item ini surat berdaftar. Sekiranya pihak anda masih tidak terima item 
+ini, kami boleh terus bukakan laporan dan akan lakukan pertanyaan dengan pusat 
+serahan yang lakukan serahan untuk item ini.
+
+(Wed, 26 Nov 2025 09:40:54) muhammad fahmie bin mat refi : kenapa? bukan ke dengan hanya no tracking pos malaysia akan tunjukkan bukti 
+penghataran gambar?
+
+(Wed, 26 Nov 2025 09:42:31) AskPos : Seperti saya maklumkan item ini adalah item surat berdaftar. Sekiranya 
+pelanggan masih tidak terima item ini kami boleh bukakan laporan untuk item ini.
+
+(Wed, 26 Nov 2025 09:43:51) muhammad fahmie bin mat refi : baiklah, saya akan maklumkan kepada mereka, saya hanya cuba membantu mereka dan 
+cik hanan pun cuba membantu saya. Terima kasih atas layanan cik
+
+(Wed, 26 Nov 2025 09:46:22) AskPos : Sama-sama Fahmie.Baik, selepas anda mendapatkan maklumat tersebut, anda boleh 
+hubungi kami semula. Selain daripada ini, ada apa-apa lagi yang boleh saya 
+bantu?
+
