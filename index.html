@@ -905,11 +905,11 @@
                                     
                                     <div class="grid grid-cols-2 gap-2">
                                         <div class="bg-gray-50 p-2 rounded-lg text-center border border-gray-100">
-                                            <span class="block text-[9px] text-gray-400 uppercase">Simpan Sebulan:</span>
+                                            <span class="block text-[9px] text-gray-400 uppercase">Bayar Sebulan:</span>
                                             <span id="calcMonthly" class="block text-sm font-bold text-emerald-600">RM 0</span>
                                         </div>
                                         <div class="bg-gray-50 p-2 rounded-lg text-center border border-gray-100">
-                                            <span class="block text-[9px] text-gray-400 uppercase">Simpan Seminggu:</span>
+                                            <span class="block text-[9px] text-gray-400 uppercase">Bayar Sehari:</span>
                                             <span id="calcWeekly" class="block text-sm font-bold text-blue-600">RM 0</span>
                                         </div>
                                     </div>
@@ -2070,52 +2070,58 @@
             }, 10);
         }
 
-        // Override default browser functions (Critical Mandate)
-        window.alert = (message) => showStatusModal("Notifikasi", message, "info");
 
 
-        // --- CALCULATOR LOGIC (UPDATED WITH SUGGESTION) ---
+        // --- CALCULATOR LOGIC (DAILY & MONTHLY with guaranteed 2 decimals + explanation) ---
         function calculateSavings() {
             const currentSavings = parseFloat(document.getElementById('calcCurrentSavings').value) || 0;
-            const paidAmount = parseFloat(document.getElementById('calcPaidAmount').value) || 0; // Ambil nilai yang dah dibayar
-            
-            // Formula Baru: Target - (Duit Tangan + Duit Dah Bayar)
+            const paidAmount = parseFloat(document.getElementById('calcPaidAmount').value) || 0;
+        
             const totalAssets = currentSavings + paidAmount;
             const needed = Math.max(0, TARGET_PER_PERSON - totalAssets);
-            
+        
             document.getElementById('calcNeeded').innerText = formatCurrency(needed);
-
+        
             const timeData = getRemainingTime();
-            
+        
             const suggestionBox = document.getElementById('calcSuggestion');
             const suggestionText = document.getElementById('calcSuggestionText');
-
+        
             if (timeData.expired || needed <= 0) {
-                 document.getElementById('calcMonthly').innerText = "RM 0";
-                 document.getElementById('calcWeekly').innerText = "RM 0";
-                 
-                 suggestionBox.classList.add('hidden');
-                 if(needed <= 0) {
-                     suggestionBox.classList.remove('hidden');
-                     suggestionText.innerText = `Mantap! Target bayaran anda (RM ${TARGET_PER_PERSON}) sudah dicapai!`;
-                     suggestionBox.classList.remove('bg-indigo-50');
-                     suggestionBox.classList.add('bg-emerald-50');
-                 }
-                 return;
+                document.getElementById('calcMonthly').innerText = formatCurrencyFixed(0);
+                document.getElementById('calcWeekly').innerText = formatCurrencyFixed(0);
+                suggestionBox.classList.add('hidden');
+        
+                if (needed <= 0) {
+                    suggestionBox.classList.remove('hidden');
+                    suggestionText.innerText = `Mantap! Target bayaran anda (RM ${TARGET_PER_PERSON}) sudah dicapai!`;
+                    suggestionBox.classList.remove('bg-indigo-50');
+                    suggestionBox.classList.add('bg-emerald-50');
+                }
+                return;
             }
-
-            // Using total days for a more accurate calculation
-            const weeksLeft = Math.max(1, Math.ceil(timeData.totalDays / 7));
-            const weeklyPayment = needed / weeksLeft;
-            const monthsLeft = Math.max(1, timeData.displayMonths); // Use display months for cleaner rounding
-            const monthlyPayment = needed / (monthsLeft || 1);
-
-            document.getElementById('calcMonthly').innerText = formatCurrency(monthlyPayment);
-            document.getElementById('calcWeekly').innerText = formatCurrency(weeklyPayment);
-            
+        
+            const daysLeft = Math.max(1, Math.ceil(timeData.totalDays));
+            const rawDaily = needed / daysLeft;                 // contoh: 291 / 150 = 1.94...
+            const dailyTwo = parseFloat(rawDaily.toFixed(2));   // 2 dp value (1.94)
+            const dailyCeil = Math.ceil(rawDaily);              // rounded up (2)
+        
+            const monthsLeft = Math.max(1, timeData.displayMonths);
+            const rawMonthly = needed / (monthsLeft || 1);
+            const monthlyTwo = parseFloat(rawMonthly.toFixed(2)); // 2 dp value (e.g. 72.75)
+        
+            document.getElementById('calcMonthly').innerText = formatCurrencyFixed(monthlyTwo);
+            document.getElementById('calcWeekly').innerText = formatCurrencyFixed(dailyTwo);
+        
             suggestionBox.classList.remove('hidden');
-            suggestionBox.classList.add('bg-indigo-50'); // Ensure background is correct for saving
-            suggestionText.innerText = `Tips: Simpan RM${Math.ceil(weeklyPayment)} seminggu dari sekarang untuk capai target dalam ${weeksLeft} minggu.`;
+            suggestionBox.classList.add('bg-indigo-50');
+        
+            suggestionText.innerText = `Tips: Bayar ${formatCurrencyFixed(dailyTwo)} sehari dari sekarang untuk capai target dalam ${daysLeft} hari.`;
+        }
+        
+        function formatCurrencyFixed(amount) {
+            const num = Number.isFinite(amount) ? amount : 0;
+            return 'RM ' + num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
         // --- ADMIN / MODALS LOGIC ---
