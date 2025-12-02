@@ -91,25 +91,25 @@
         }
         /* Image Slider Styles */
         .image-slider {
-            width: 100%;
-            aspect-ratio: 4 / 3; /* Pastikan ratio ikut gambar */
-            overflow: hidden;
-            position: relative;
-            border-radius: 1rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
+          width: 100%;
+          aspect-ratio: 1 / 1;      /* kekalkan square */
+          max-width: 600px;         /* optional - had maksimum */
+          margin-bottom: 20px;
+          overflow: hidden;
+          border-radius: 1rem;
+          position: relative;
         }
+        
         .slider-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* JANGAN ubah */
-            position: absolute;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;        /* atau 'contain' jika mahu tiada crop */
+          object-position: center center;
+          position: absolute;
+          opacity: 0;
+          transition: opacity 1s ease-in-out;
         }
-        .slider-image.active {
-            opacity: 1;
-        }
+        .slider-image.active { opacity: 1; }
         
         /* FIX: Ensure content inside Top Stat cards is aligned and clean */
         .stat-content {
