@@ -905,11 +905,11 @@
                                     
                                     <div class="grid grid-cols-2 gap-2">
                                         <div class="bg-gray-50 p-2 rounded-lg text-center border border-gray-100">
-                                            <span class="block text-[9px] text-gray-400 uppercase">Simpan Bulanan Untuk Capai Target</span>
+                                            <span class="block text-[9px] text-gray-400 uppercase">Simpan Sebulan:</span>
                                             <span id="calcMonthly" class="block text-sm font-bold text-emerald-600">RM 0</span>
                                         </div>
                                         <div class="bg-gray-50 p-2 rounded-lg text-center border border-gray-100">
-                                            <span class="block text-[9px] text-gray-400 uppercase">Simpan Mingguan Untuk Capai Target</span>
+                                            <span class="block text-[9px] text-gray-400 uppercase">Simpan Seminggu:</span>
                                             <span id="calcWeekly" class="block text-sm font-bold text-blue-600">RM 0</span>
                                         </div>
                                     </div>
@@ -1503,9 +1503,17 @@
         
         // Custom function to handle Home link (used by menu and squid icon)
         function scrollToTopAndCloseMenu() {
-            scrollToTop();
-            // Wait for scroll to finish before closing menu for smoother UX
-            setTimeout(toggleMenu, 300);
+            // Scroll to top inside mobile-content
+            const scrollArea = document.getElementById('mobile-content');
+        
+            if (scrollArea) {
+                scrollArea.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        
+            // Tutup menu terus
+            toggleMenu();
         }
 
         // --- TIME LOGIC ---
