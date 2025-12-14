@@ -610,18 +610,18 @@
                 <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 text-blue-600">
                     <i class="fa-solid fa-lock"></i>
                 </div>
-                <h3 class="font-bold text-xl text-slate-800">Admin Access</h3>
-                <p class="text-xs text-slate-500">Sila log masuk untuk menguruskan data.</p>
+                <h3 class="font-bold text-xl text-slate-800">Pentadbir Sistem</h3>
+                <p class="text-xs text-slate-500">Sila log masuk untuk menguruskan data:</p>
             </div>
     
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">Email</label>
-                    <input type="email" id="adminEmail" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition" placeholder="admin@sotong.com" required>
+                    <input type="email" id="adminEmail" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition" placeholder="abc@contoh.com" required>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">Kata Laluan</label>
-                    <input type="password" id="adminPassword" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition" placeholder="••••••••" required>
+                    <input type="password" id="adminPassword" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition" placeholder="••••" required>
                 </div>
                 
                 <div id="loginErrorMsg" class="hidden text-xs text-red-500 text-center bg-red-50 p-2 rounded-lg border border-red-100">
@@ -640,13 +640,29 @@
         </div>
     </div>
     
+    <div id="loginSuccessModal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[130] hidden flex items-center justify-center transition-opacity opacity-0">
+        <div onclick="event.stopPropagation()" class="bg-white rounded-2xl p-6 w-[85%] max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 text-center relative">
+            
+            <div class="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600 animate-bounce">
+                <i class="fa-solid fa-user-check text-2xl"></i>
+            </div>
+            
+            <h3 class="font-bold text-xl text-slate-800 mb-2">Berjaya Log Masuk!</h3>
+            <p class="text-sm text-slate-500 mb-6">Selamat Datang</p>
+            
+            <button onclick="closeLoginSuccessModal()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition shadow-lg">
+                Teruskan
+            </button>
+        </div>
+    </div>
+    
     <div id="logoutModal" onclick="closeLogoutModal()" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-[120]">
         <div class="bg-white rounded-xl p-6 w-[85%] max-w-sm text-center m-4 shadow-2xl" onclick="event.stopPropagation()">
             <div class="bg-red-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 text-red-500">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
             </div>
             <h3 class="font-bold text-lg mb-2">Log Keluar?</h3>
-            <p class="text-sm text-gray-600 mb-6">Anda pasti mahu log keluar dari akaun admin?</p>
+            <p class="text-sm text-gray-600 mb-6">Anda pasti mahu log keluar?</p>
             <div class="flex gap-3 justify-center">
                 <button onclick="closeLogoutModal()" class="px-5 py-2.5 text-gray-600 hover:bg-gray-100 rounded-xl text-sm font-medium transition">Batal</button>
                 <button onclick="handleLogout()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-red-200 transition transform active:scale-95">Ya, Log Keluar</button>
@@ -662,7 +678,7 @@
             </div>
             
             <h3 class="font-bold text-xl text-slate-800 mb-2">Berjaya Log Keluar!</h3>
-            <p class="text-sm text-slate-500 mb-6">Sesi admin anda telah ditamatkan dengan selamat.</p>
+            <p class="text-sm text-slate-500 mb-6">Sesi anda telah ditamatkan</p>
             
             <button onclick="closeLogoutSuccessModal()" class="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-bold transition shadow-lg">
                 Terima Kasih
