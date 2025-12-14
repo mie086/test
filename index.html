@@ -802,6 +802,43 @@
         </button>
     </div>
 
+    <div id="genericSuccessModal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[150] hidden flex items-center justify-center transition-opacity opacity-0">
+        <div onclick="event.stopPropagation()" class="bg-white rounded-2xl p-6 w-[85%] max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 text-center relative">
+            
+            <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-green-600 animate-bounce">
+                <i class="fa-solid fa-check text-2xl"></i>
+            </div>
+            
+            <h3 id="genSuccessTitle" class="font-bold text-xl text-slate-800 mb-2">Berjaya!</h3>
+            <p id="genSuccessDesc" class="text-sm text-slate-500 mb-6">Maklumat Anda Telah Disimpan.</p>
+            
+            <button onclick="closeGenericSuccessModal()" class="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-bold transition shadow-lg">
+                Terima Kasih
+            </button>
+        </div>
+    </div>
+
+    <div id="confirmationModal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[160] hidden flex items-center justify-center transition-opacity opacity-0">
+        <div onclick="event.stopPropagation()" class="bg-white rounded-2xl p-6 w-[85%] max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 text-center relative">
+            
+            <div class="bg-amber-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-500 animate-pulse">
+                <i class="fa-solid fa-triangle-exclamation text-3xl"></i>
+            </div>
+            
+            <h3 class="font-bold text-xl text-slate-800 mb-2">Anda Pasti?</h3>
+            <p id="confirmMessage" class="text-sm text-slate-500 mb-6">Tindakan ini tidak boleh dikembalikan.</p>
+            
+            <div class="flex gap-3">
+                <button onclick="closeConfirmationModal()" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-sm font-bold transition">
+                    Batal
+                </button>
+                <button onclick="executeConfirmAction()" class="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-bold transition shadow-lg">
+                    Ya, Padam
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 
 </body>
