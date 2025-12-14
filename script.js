@@ -1,21 +1,15 @@
-        // --- 1. KONFIGURASI SUPABASE ---
         const SUPABASE_URL = 'https://twbmjojqyhmjsoywiqrs.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Ym1qb2pxeWhtanNveXdpcXJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5MzUyODUsImV4cCI6MjA4MDUxMTI4NX0._Q3peI3s04DuBHyHE3qUl-OzcagrbpWdP2-QIid3agY';
         
-        // Kita namakan 'supabaseClient' supaya tidak keliru dengan library asal
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
         let isAdmin = false;
         
-        // --- FUNGSI BARU: TARIK DATA DARI SUPABASE ---
         async function loadDataFromSupabase() {
             
-            // Tunjuk status loading (optional, bagus untuk UX)
             console.log("Sedang menarik data dari Supabase...");
         
             try {
-                // 1. Tarik data Members
-                // Kita guna .order('id') supaya susunan tak lari
                 let { data: membersData, error: errorMembers } = await supabaseClient
                     .from('members')
                     .select('*')
@@ -23,20 +17,17 @@
         
                 if (errorMembers) throw errorMembers;
         
-                // 2. Tarik data Expenses
                 let { data: expensesData, error: errorExpenses } = await supabaseClient
                     .from('expenses')
                     .select('*');
         
                 if (errorExpenses) throw errorExpenses;
         
-                // 3. Masukkan data ke dalam variable global
                 if (membersData) members = membersData;
                 if (expensesData) expenses = expensesData;
         
-                // 4. Render semula table dengan data baru
-                renderTable();     // Update table ahli
-                renderExpenses();  // Update table belanja
+                renderTable();
+                renderExpenses();
                 
                 console.log("Data berjaya dikemaskini!");
         
@@ -46,26 +37,21 @@
             }
         }
         
-        // --- 2. LOGIC LOGIN & LOGOUT ---
-        
+
         document.addEventListener('DOMContentLoaded', async () => {
             
-            // 1. Jalan fungsi-fungsi UI biasa dulu
             startImageSlider();
             initChecklist();
         
-            // 2. PENTING: Panggil data dari Supabase
             await loadDataFromSupabase(); 
         
-            // 3. Check session user (Kod asal anda untuk Admin)
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 isAdmin = true;
                 updateAdminUI();
-                startAutoLogoutTimer(); // <--- TAMBAH BARIS INI
+                startAutoLogoutTimer(); 
             }
             
-            // 4. Toast logic (Kod asal anda)
             setTimeout(() => {
                 const toast = document.getElementById('paymentToast');
                 if(toast) {
@@ -84,8 +70,7 @@
             }
         }
         
-        // --- PENGENDALIAN MODAL LOGIN/LOGOUT ---
-        
+
         function checkAuthAndToggle() {
             if (isAdmin) {
                 document.getElementById('logoutModal').classList.remove('hidden');
@@ -98,7 +83,6 @@
             const modal = document.getElementById('loginModal');
             const content = document.getElementById('loginModalContent');
             modal.classList.remove('hidden');
-            // Animasi masuk
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 content.classList.remove('scale-95');
@@ -119,10 +103,8 @@
             document.getElementById('logoutModal').classList.add('hidden');
         }
         
-        // FUNGSI MODAL SUCCESS BARU
         function openLogoutSuccessModal() {
             const modal = document.getElementById('logoutSuccessModal');
-            // Pastikan kita select elemen dalam modal (div pertama) untuk animasi
             const content = modal.querySelector('div'); 
             
             modal.classList.remove('hidden');
@@ -132,7 +114,6 @@
                 content.classList.add('scale-100');
                     }, 10);
                 
-                    // --- Pilihan ---
                     setTimeout(() => closeLogoutSuccessModal(), 3000);
                 }
         
@@ -157,7 +138,6 @@
                 content.classList.add('scale-100');
             }, 10);
         
-            // Auto tutup selepas 2 saat (Pilihan)
             setTimeout(() => closeLoginSuccessModal(), 3000);
         }
         
@@ -171,8 +151,7 @@
             setTimeout(() => { modal.classList.add('hidden'); }, 300);
         }
         
-        // --- PROSES LOGIN & LOGOUT ---
-        
+
         async function handleLogin(e) {
             e.preventDefault();
             
@@ -181,12 +160,10 @@
             const btn = document.getElementById('btnLoginSubmit');
             const errorMsg = document.getElementById('loginErrorMsg');
         
-            // Loading UI
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
             btn.disabled = true;
             errorMsg.classList.add('hidden');
         
-            // FIX: Gunakan supabaseClient (bukan supabase)
             const { data, error } = await supabaseClient.auth.signInWithPassword({
                 email: email,
                 password: password,
@@ -199,18 +176,16 @@
                 errorMsg.textContent = "Email atau password tidak sah.";
                 errorMsg.classList.remove('hidden');
             } else {
-                // Berjaya Login
                 isAdmin = true;
                 closeLoginModal();
             
-                openLoginSuccessModal(); // <--- TAMBAH BARIS INI
+                openLoginSuccessModal();
             
                 updateAdminUI();
                 startAutoLogoutTimer();
                 btn.innerHTML = 'Log Masuk <i class="fa-solid fa-arrow-right"></i>';
                 btn.disabled = false;
                 
-                // Reset form
                 document.getElementById('adminEmail').value = '';
                 document.getElementById('adminPassword').value = '';
             }
@@ -226,7 +201,6 @@
                 closeLogoutModal(); 
                 updateAdminUI();
                 
-                // Reset mesej modal ke asal (sebab auto-logout mungkin dah ubah teks ni)
                 const modal = document.getElementById('logoutSuccessModal');
                 modal.querySelector('h3').innerText = "Berjaya Log Keluar!";
                 modal.querySelector('p').innerText = "Sesi anda telah ditamatkan";
@@ -237,24 +211,20 @@
         
         function updateAdminUI() {
             const dot = document.getElementById('loginStatusDot');
-            const fab = document.getElementById('adminFab'); // Butang terapung (Floating Button)
+            const fab = document.getElementById('adminFab');
         
             if (isAdmin) {
-                // Tunjuk indikator hijau & butang Admin
                 if(dot) dot.classList.remove('hidden'); 
                 if(fab) fab.classList.remove('hidden'); 
                 if(fab) fab.classList.add('flex');
                 console.log("Admin Mode: ON");
             } else {
-                // Sorok indikator & butang Admin
                 if(dot) dot.classList.add('hidden'); 
                 if(fab) fab.classList.add('hidden'); 
                 if(fab) fab.classList.remove('flex');
                 console.log("Admin Mode: OFF");
             }
         
-            // --- [PENTING] LUKIS SEMULA TABLE ---
-            // Ini memaksa browser letak butang Edit/Delete bila admin login
             renderTable();     
             renderExpenses();  
         }
@@ -273,22 +243,18 @@
                 .replace(/'/g, "&#039;");
         }
         
-        // --- DATA MOCKUP ---
         const sliderImages = [{ url: "images/candat1.jpg"}, { url: "images/candat2.jpg"}, { url: "images/candat3.jpg"}, { url: "images/candat4.jpg"}, { url: "images/candat5.jpg"}];
         let currentImageIndex = 0;
         let slideInterval;
         
-        // Tarikh telah ditukar kepada dd-mm-yyyy
         let members = []; 
         let expenses = [];
 
-        // Parse Tarikh dd-mm-yyyy dengan selamat
         function parseMYDate(dateStr) {
             const [day, month, year] = dateStr.split('-').map(Number);
             return new Date(year, month - 1, day);
         }
 
-        // --- HELPER TIME (PENTING!) ---
         function getRemainingTime() {
             const now = new Date();
             const diff = DEADLINE - now;
@@ -296,18 +262,15 @@
             return { expired: diff <= 0, totalDays: days };
         }
 
-        // --- CALENDAR LOGIC ---
         let currentCalDate = new Date(); 
         
         function openCalendarModal() {
             const modal = document.getElementById('calendarModal');
             const content = document.getElementById('calendarModalContent');
             
-            // Reset date
             currentCalDate = new Date();
             renderCalendar();
             
-            // Setup Countdown
             const timeData = getRemainingTime();
             const countEl = document.getElementById('modalCountdown');
             if (timeData.expired) {
@@ -352,7 +315,6 @@
             const grid = document.getElementById('calGrid');
             grid.innerHTML = "";
             
-            // Empty slots
             for (let i = 0; i < firstDay; i++) grid.innerHTML += `<span></span>`;
             
             const today = new Date();
@@ -373,7 +335,6 @@
             }
         }
 
-        // --- OTHER FUNCTIONS ---
         function triggerSquidSwim() {
             if (document.querySelectorAll('.swimming-squid').length >= 5) return;
 
@@ -411,7 +372,7 @@
         }
         function changeSlide(n) {
             const images = document.querySelectorAll('.slider-image');
-            if (images.length === 0) return; // Elak error jika tiada gambar
+            if (images.length === 0) return;
         
             images[currentImageIndex].classList.remove('active');
         
@@ -441,25 +402,20 @@
             const tbody = document.getElementById('memberTableBody');
             tbody.innerHTML = '';
         
-            // 1. Paparkan Target Tetap (RM 5,000)
             const targetDisplay = document.getElementById('totalTargetDisplay');
             if (targetDisplay) {
                 targetDisplay.innerText = formatCurrency(FIXED_TARGET);
             }
         
-            // 2. Susun ahli ikut bayaran tertinggi
             const sortedMembers = [...members].sort((a,b) => b.paid - a.paid);
             let totalCollected = 0;
             
-            // 3. Render Baris Table
             sortedMembers.forEach(m => {
                 totalCollected += parseFloat(m.paid); // Pastikan nombor
                 
-                // Kira peratus individu
                 const pct = Math.min(100, (m.paid / TARGET_PER_PERSON) * 100);
                 const safeName = escapeHtml(m.name);
                 
-                // Butang Edit (Pensil) hanya muncul untuk Admin
                 let adminBtn = '';
                 if (isAdmin) {
                     adminBtn = `<i onclick="editMemberConfig(${m.id})" class="fa-solid fa-pen text-[10px] ml-2 text-gray-300 hover:text-blue-500 cursor-pointer" title="Urus Ahli"></i>`;
@@ -485,22 +441,16 @@
                     </tr>`;
             });
         
-            // 4. Update Summary Utama (Atas Table)
             document.getElementById('tableSummaryCollected').innerText = formatCurrency(totalCollected);
         
-            // --- [INI BAHAGIAN YANG HILANG SEBELUM INI] ---
-            // Kira peratus keseluruhan (Total / 5000 * 100)
             const globalPct = Math.min(100, (totalCollected / FIXED_TARGET) * 100);
             
-            // Update Progress Bar
             const progressBar = document.getElementById('tableSummaryProgress');
             if(progressBar) progressBar.style.width = globalPct + '%';
             
-            // Update Teks %
             const pctText = document.getElementById('summaryPercentage');
             if(pctText) pctText.innerText = Math.round(globalPct) + '%';
-            // ----------------------------------------------
-            
+
             updateExpensesSummary(totalCollected);
         }
 
@@ -540,7 +490,6 @@
                 const safeCategory = escapeHtml(e.category);
                 const safeDetail = escapeHtml(e.detail);
                 
-                // Logik Admin: Tunjuk butang edit jika isAdmin = true
                 let adminAction = '';
                 if (isAdmin) {
                     adminAction = `
@@ -566,23 +515,18 @@
             updateExpensesSummary(members.reduce((sum, m) => sum + m.paid, 0)); // Recalculate summary
         }
         function updateExpensesSummary(totalCollected) {
-            // Kira total belanja
             let totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
             let netBalance = totalCollected - totalExpenses;
 
-            // 1. Update Kolum Terkumpul (ID baru: summaryCollected)
             const collectedEl = document.getElementById('summaryCollected');
             if (collectedEl) collectedEl.innerText = formatCurrency(totalCollected);
 
-            // 2. Update Kolum Belanja
             const expEl = document.getElementById('summaryExpenses');
             if (expEl) expEl.innerText = formatCurrency(totalExpenses);
 
-            // 3. Update Kolum Baki Bersih
             const netEl = document.getElementById('summaryNetBalance');
             if (netEl) {
                 netEl.innerText = formatCurrency(netBalance);
-                // Tukar warna jika negatif
                 netEl.className = netBalance < 0 
                     ? "font-bold text-red-600 text-sm" 
                     : "font-bold text-blue-600 text-sm";
@@ -602,7 +546,6 @@
             });
         }
 
-        // --- FUNGSI UNTUK EXPAND/COLLAPSE TENTATIF ---
         function toggleTentative(element) {
             const content = element.nextElementSibling;
             
@@ -691,58 +634,46 @@
             }
         }
         
-        // 3. Fungsi Bila Tekan Pensil pada Sejarah (Naikkan data ke Kotak Hijau)
         function prepareEditHistoryItem(memberId, index) {
             const m = members.find(x => x.id === memberId);
             const item = m.history[index];
             
-            // Ubah UI Kotak Hijau jadi "Mode Edit"
             document.getElementById('paymentBoxContainer').classList.replace('bg-emerald-50', 'bg-amber-50');
             document.getElementById('paymentBoxContainer').classList.replace('border-emerald-100', 'border-amber-100');
             
             document.getElementById('paymentBoxTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-600"></i> <span class="text-amber-700">Kemaskini Rekod Ini</span>`;
             document.getElementById('btnCancelHistoryEdit').classList.remove('hidden');
             
-            // Masukkan data lama
             document.getElementById('editHistoryIndex').value = index; // Set Index!
             document.getElementById('initPayAmount').value = item.amount;
             
-            // Format date dd-mm-yyyy -> yyyy-mm-dd
             const [d, M, y] = item.date.split('-');
             document.getElementById('initPayDate').value = `${y}-${M.padStart(2,'0')}-${d.padStart(2,'0')}`;
             
-            // Focus ke input amount
             document.getElementById('initPayAmount').focus();
         }
         
-        // 4. Fungsi Batal Edit (Kembali ke Mode Tambah)
         function cancelHistoryEdit() {
-            // Reset UI Kotak Hijau ke asal
             document.getElementById('paymentBoxContainer').classList.replace('bg-amber-50', 'bg-emerald-50');
             document.getElementById('paymentBoxContainer').classList.replace('border-amber-100', 'border-emerald-100');
         
             document.getElementById('paymentBoxTitle').innerHTML = `<i class="fa-solid fa-plus-circle"></i> Jumlah Bayaran`;
             document.getElementById('btnCancelHistoryEdit').classList.add('hidden');
             
-            // Kosongkan input
             document.getElementById('editHistoryIndex').value = '';
             document.getElementById('initPayAmount').value = '';
             document.getElementById('initPayDate').valueAsDate = new Date();
         }
         
-        // --- 5. Fungsi Simpan (Handle Tambah & Update) ---
         async function submitMemberConfig(e) {
             e.preventDefault();
             const id = document.getElementById('configMemberId').value;
             const name = document.getElementById('configMemberName').value;
             
-            // Data Pembayaran
             const amountVal = parseFloat(document.getElementById('initPayAmount').value) || 0;
             const dateInput = document.getElementById('initPayDate').value; // Format: yyyy-mm-dd
             const editIndex = document.getElementById('editHistoryIndex').value;
         
-            // --- HELPER FUNCTION: FORMAT TARIKH (PENTING!) ---
-            // Tukar yyyy-mm-dd -> dd-mm-yyyy (dengan leading zero)
             const formatDate = (isoDateString) => {
                 const d = new Date(isoDateString);
                 const day = d.getDate().toString().padStart(2, '0');   // Tambah '0' jika < 10
@@ -785,7 +716,6 @@
                 }
         
             } else {
-                // --- PROSES INSERT AHLI BARU ---
                 let history = [];
                 let paid = 0;
                 
@@ -814,7 +744,7 @@
             if(!id) return;
         
             showConfirmationModal(
-                "Adakah anda pasti mahu padam ahli ini?",
+                "Adakah anda pasti mahu memadam ahli ini?",
                 async () => {
 
                     const { error } = await supabaseClient
@@ -825,7 +755,7 @@
                     if(!error) {
                         toggleMemberConfigModal(false);
                         
-                        showSuccessModal("Selesai", "Ahli telah berjaya dipadam");
+                        showSuccessModal("Berjaya", "Ahli telah dipadam");
                         
                         loadDataFromSupabase();
                     } else {
@@ -835,8 +765,7 @@
             );
         }
         
-        // --- 2. PAYMENT & HISTORY (Full CRUD: Create, Read, Update, Delete) ---
-        
+
         function renderHistoryList(memberId) {
             const m = members.find(x => x.id === memberId);
             const wrapper = document.getElementById('paymentHistoryList');
@@ -850,7 +779,6 @@
             wrapper.classList.remove('hidden');
             container.innerHTML = '';
         
-            // Loop history dan tambah butang Edit & Delete
             m.history.forEach((h, index) => {
                 container.innerHTML += `
                     <div class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-100 hover:bg-blue-50 transition">
@@ -868,9 +796,7 @@
             });
         }
         
-        // --- 3. EXPENSES CRUD (MODE TAMBAH & MODE EDIT TERPISAH) ---
-        
-        // Fungsi 1: Buka Modal (Dipanggil oleh butang merah FAB)
+
         function toggleExpenseModal(show) {
             const modal = document.getElementById('expenseModal');
             const content = modal.querySelector('div');
@@ -896,24 +822,20 @@
             }
         }
         
-        // Fungsi 2: Mode Edit (Dipanggil oleh ikon pensil pada list)
         function editExpense(id) {
             const e = expenses.find(x => x.id === id);
             if (!e) return;
         
-            // Buka modal secara manual (tanpa reset)
             const modal = document.getElementById('expenseModal');
             const content = modal.querySelector('div');
             modal.classList.remove('hidden');
             setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.add('scale-100'); }, 10);
         
-            // --- MODE EDIT (Isi Data Lama) ---
             document.getElementById('expenseModalTitle').innerText = "Kemaskini Perbelanjaan";
             document.getElementById('btnExpSubmit').innerText = "Kemaskini";
             
             document.getElementById('expId').value = e.id;
             
-            // Format Tarikh (dd-mm-yyyy -> yyyy-mm-dd)
             const [day, month, year] = e.date.split('-');
             const fmtMonth = month.length < 2 ? '0' + month : month;
             const fmtDay = day.length < 2 ? '0' + day : day;
@@ -926,7 +848,6 @@
             document.getElementById('btnDeleteExp').classList.remove('hidden'); // Tunjuk butang delete!
         }
         
-        // --- Fungsi Submit Expense (Dengan Format Tarikh Betul) ---
         async function submitExpense(e) {
             e.preventDefault();
             const id = document.getElementById('expId').value;
@@ -935,8 +856,6 @@
             const detail = document.getElementById('expDetail').value;
             const amount = parseFloat(document.getElementById('expAmount').value);
         
-            // --- FORMAT TARIKH (DIBETULKAN) ---
-            // Tukar yyyy-mm-dd -> dd-mm-yyyy (dengan 0 di depan)
             const d = new Date(dateInput);
             const day = d.getDate().toString().padStart(2, '0');   // 2 -> 02
             const month = (d.getMonth() + 1).toString().padStart(2, '0'); // 1 -> 01
@@ -947,7 +866,6 @@
             const payload = { date: dateStr, category, detail, amount };
         
             if (id) {
-                // --- UPDATE (Sebab ada ID) ---
                 const { error } = await supabaseClient.from('expenses').update(payload).eq('id', id);
                 if(!error) { 
                     showSuccessModal("Direkod!", "Perbelanjaan berjaya dikemaskini");
@@ -958,7 +876,6 @@
                     alert("Gagal update: " + error.message);
                 }
             } else {
-                // --- INSERT (Sebab tiada ID) ---
                 const { error } = await supabaseClient.from('expenses').insert([payload]);
                 if(!error) { 
                     showSuccessModal("Berjaya!", "Perbelanjaan berjaya ditambah");
@@ -988,7 +905,7 @@
                         .eq('id', id);
         
                     if(!error) { 
-                        showSuccessModal("Selesai!", "Rekod telah dipadam");
+                        showSuccessModal("Berjaya!", "Rekod telah dipadam");
                         toggleExpenseModal(false); 
                         loadDataFromSupabase(); 
                     } else {
@@ -1100,4 +1017,43 @@
                 await pendingAction();
             }
             closeConfirmationModal();
+        }
+
+        function deletePaymentHistoryItem(memberId, index) {
+            showConfirmationModal(
+                "Adakah anda pasti mahu memadam rekod bayaran ini?",
+                async () => {
+
+                    const m = members.find(x => x.id === memberId);
+                    if (!m) return;
+        
+                    let currentHistory = [...m.history];
+                    const amountToRemove = parseFloat(currentHistory[index].amount);
+        
+                    currentHistory.splice(index, 1);
+        
+                    const newPaid = parseFloat(m.paid) - amountToRemove;
+        
+                    const { error } = await supabaseClient
+                        .from('members')
+                        .update({ paid: newPaid, history: currentHistory })
+                        .eq('id', memberId);
+        
+                    if (!error) {
+                        showSuccessModal("Berjaya", "Rekod bayaran dipadam.");
+        
+                        await loadDataFromSupabase(); 
+        
+                        const updatedMember = members.find(x => x.id === memberId);
+                        if (updatedMember) {
+                            renderMemberHistoryInModal(updatedMember);
+                            
+                            cancelHistoryEdit(); 
+                        }
+        
+                    } else {
+                        alert("Gagal: " + error.message);
+                    }
+                }
+            );
         }
