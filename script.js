@@ -45,13 +45,26 @@
         
             await loadDataFromSupabase(); 
         
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
-                isAdmin = true;
-                updateAdminUI();
-                startAutoLogoutTimer(); 
-            }
+            // --- MULA: KOD AUTH BARU (GANTIKAN DI SINI) ---
+            // Fungsi ini akan berjalan automatik setiap kali user Login atau Logout
+            supabaseClient.auth.onAuthStateChange((event, session) => {
+                
+                // Jika session wujud, isAdmin jadi true. Jika null, jadi false.
+                isAdmin = !!session; 
+                
+                updateAdminUI(); // Terus update butang (tunjuk/sorok)
+                
+                if (isAdmin) {
+                    console.log("Admin dikesan. Timer bermula.");
+                    startAutoLogoutTimer(); 
+                } else {
+                    console.log("Tiada admin. Timer berhenti.");
+                    stopAutoLogoutTimer();
+                }
+            });
+            // --- TAMAT: KOD AUTH BARU ---
             
+            // Kod Toast (kekal sama)
             setTimeout(() => {
                 const toast = document.getElementById('paymentToast');
                 if(toast) {
@@ -160,10 +173,38 @@
             const btn = document.getElementById('btnLoginSubmit');
             const errorMsg = document.getElementById('loginErrorMsg');
         
+            // --- LOGIK BLOKER (MULA) ---
+            const MAX_ATTEMPTS = 3;
+            const BLOCK_DURATION = 60 * 1000; // 60 saat (1 minit)
+        
+            // Periksa jika pengguna sedang diblock
+            const blockUntil = localStorage.getItem('loginBlockUntil');
+            if (blockUntil) {
+                const timeLeft = parseInt(blockUntil) - Date.now();
+                if (timeLeft > 0) {
+                    const secondsLeft = Math.ceil(timeLeft / 1000);
+                    errorMsg.innerHTML = `<i class="fa-solid fa-hand"></i> Sila tunggu ${secondsLeft} saat lagi.`;
+                    errorMsg.classList.remove('hidden');
+                    errorMsg.classList.replace('text-red-500', 'text-orange-600'); // Tukar warna amaran
+                    errorMsg.classList.replace('bg-red-50', 'bg-orange-50');
+                    return; // Hentikan fungsi di sini
+                } else {
+                    // Masa block dah tamat, reset storage
+                    localStorage.removeItem('loginBlockUntil');
+                    localStorage.removeItem('loginAttempts');
+                }
+            }
+            // --- LOGIK BLOKER (TAMAT) ---
+        
+            // UI Loading
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
             btn.disabled = true;
             errorMsg.classList.add('hidden');
+            // Reset warna error kepada merah (jika sebelum ini oren)
+            errorMsg.classList.replace('text-orange-600', 'text-red-500');
+            errorMsg.classList.replace('bg-orange-50', 'bg-red-50');
         
+            // Cuba Login ke Supabase
             const { data, error } = await supabaseClient.auth.signInWithPassword({
                 email: email,
                 password: password,
@@ -171,21 +212,44 @@
         
             if (error) {
                 console.error("Login Error:", error);
-                btn.innerHTML = 'Log Masuk <i class="fa-solid fa-arrow-right"></i>';
-                btn.disabled = false;
-                errorMsg.textContent = "Email atau password tidak sah.";
-                errorMsg.classList.remove('hidden');
-            } else {
-                isAdmin = true;
-                closeLoginModal();
-            
-                openLoginSuccessModal();
-            
-                updateAdminUI();
-                startAutoLogoutTimer();
-                btn.innerHTML = 'Log Masuk <i class="fa-solid fa-arrow-right"></i>';
-                btn.disabled = false;
                 
+                // --- KIRA PERCUBAAN GAGAL (MULA) ---
+                let attempts = parseInt(localStorage.getItem('loginAttempts') || '0') + 1;
+                localStorage.setItem('loginAttempts', attempts);
+        
+                let msg = "Email atau password salah.";
+        
+                if (attempts >= MAX_ATTEMPTS) {
+                    // Set masa block
+                    const releaseTime = Date.now() + BLOCK_DURATION;
+                    localStorage.setItem('loginBlockUntil', releaseTime);
+                    msg = `Terlalu banyak percubaan! <br>Sila tunggu 1 minit.`;
+                } else {
+                    const left = MAX_ATTEMPTS - attempts;
+                    msg = `Salah. Tinggal <b>${left}</b> kali percubaan lagi.`;
+                }
+                // --- KIRA PERCUBAAN GAGAL (TAMAT) ---
+        
+                btn.innerHTML = 'Log Masuk <i class="fa-solid fa-arrow-right"></i>';
+                btn.disabled = false;
+                errorMsg.innerHTML = msg;
+                errorMsg.classList.remove('hidden');
+        
+            } else {
+                // BERJAYA LOG IN
+                // Reset semua rekod percubaan sebab dah berjaya
+                localStorage.removeItem('loginAttempts');
+                localStorage.removeItem('loginBlockUntil');
+        
+                // Note: Kita tak perlu set isAdmin = true di sini lagi 
+                // sebab listener 'onAuthStateChange' (yang kita buat tadi) akan uruskan.
+                
+                closeLoginModal();
+                openLoginSuccessModal();
+                
+                // Reset Form
+                btn.innerHTML = 'Log Masuk <i class="fa-solid fa-arrow-right"></i>';
+                btn.disabled = false;
                 document.getElementById('adminEmail').value = '';
                 document.getElementById('adminPassword').value = '';
             }
@@ -195,11 +259,7 @@
             const { error } = await supabaseClient.auth.signOut();
             
 
-            isAdmin = false;
-            stopAutoLogoutTimer();
-            
             closeLogoutModal(); 
-            updateAdminUI();
             const modal = document.getElementById('logoutSuccessModal');
             if (modal) {
                 const title = modal.querySelector('h3');
@@ -920,21 +980,31 @@
         }
 
         let afkTimer;
-        const AFK_LIMIT = 5 * 60 * 1000; 
+        const AFK_LIMIT = 3 * 60 * 1000;
         
         function startAutoLogoutTimer() {
-            window.onload = resetAfkTimer;
-            document.onmousemove = resetAfkTimer;
-            document.onkeypress = resetAfkTimer;
-            document.ontouchstart = resetAfkTimer; 
-            document.onclick = resetAfkTimer;
-            document.onscroll = resetAfkTimer;
+            // Kita guna senarai event yang penting sahaja.
+            // 'mousemove' dibuang untuk elak lag.
+            // { passive: true } menjadikan scroll lebih lancar di mobile.
+            const events = ['click', 'keypress', 'touchstart', 'scroll'];
+            
+            events.forEach(evt => {
+                document.addEventListener(evt, resetAfkTimer, { passive: true });
+            });
         
             resetAfkTimer(); 
         }
         
         function stopAutoLogoutTimer() {
             clearTimeout(afkTimer);
+            
+            // Kita perlu "bersihkan" event listener bila user logout
+            // Supaya browser tak terus memantau walaupun dah tak perlu
+            const events = ['click', 'keypress', 'touchstart', 'scroll'];
+            
+            events.forEach(evt => {
+                document.removeEventListener(evt, resetAfkTimer);
+            });
         }
         
         function resetAfkTimer() {
@@ -948,11 +1018,14 @@
                 await handleLogout();
                 
                 const modal = document.getElementById('logoutSuccessModal');
-                const title = modal.querySelector('h3');
-                const desc = modal.querySelector('p');
-                
-                if(title) title.innerText = "Sesi Tamat";
-                if(desc) desc.innerText = "Anda telah dilog keluar kerana tidak aktif";
+                // Pastikan modal wujud sebelum ubah text (elak error)
+                if (modal) {
+                    const title = modal.querySelector('h3');
+                    const desc = modal.querySelector('p');
+                    
+                    if(title) title.innerText = "Sesi Tamat";
+                    if(desc) desc.innerText = "Anda telah dilog keluar kerana tidak aktif";
+                }
         
             }, AFK_LIMIT);
         }
