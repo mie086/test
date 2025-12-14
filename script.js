@@ -627,7 +627,6 @@
                 modal.classList.remove('hidden');
                 setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.add('scale-100'); }, 10);
                 
-                // Reset Form ke Mode "Tambah Ahli Baru"
                 document.getElementById('memberModalTitle').innerHTML = "Tambah Ahli Baru";
                 document.getElementById('configMemberId').value = '';
                 document.getElementById('configMemberName').value = '';
@@ -782,7 +781,8 @@
                     .eq('id', id);
                 
                 if(!error) { 
-                    alert("Data berjaya disimpan!");
+                    showSuccessModal("Disimpan!", "Data ahli & bayaran berjaya dikemaskini.");
+                    
                     toggleMemberConfigModal(false); 
                     loadDataFromSupabase(); 
                 } else {
@@ -805,8 +805,9 @@
                     .insert([{ name: name, paid: paid, history: history }]);
                     
                 if(!error) { 
-                    alert(`Ahli ${name} berjaya ditambah!`); 
-                    toggleMemberConfigModal(false); 
+                    showSuccessModal("Selesai", "Ahli telah berjaya ditambah");
+                    
+                    toggleMemberConfigModal(false);
                     loadDataFromSupabase(); 
                 }
             }
@@ -833,7 +834,8 @@
                 .eq('id', id);
         
             if(!error) { 
-                alert("Ahli berjaya dipadam."); 
+                showSuccessModal("Selesai", "Ahli telah berjaya dipadam dari sistem.");
+                
                 toggleMemberConfigModal(false); 
                 loadDataFromSupabase(); 
             } else {
@@ -887,17 +889,14 @@
                 modal.classList.remove('hidden');
                 setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.add('scale-100'); }, 10);
                 
-                // --- MODE TAMBAH (Reset Semula) ---
                 document.getElementById('expenseModalTitle').innerText = "Tambah Perbelanjaan";
-                document.getElementById('btnExpSubmit').innerText = "Simpan";
-                document.getElementById('btnDeleteExp').classList.add('hidden'); // Sorok butang delete
+                document.getElementById('btnExpSubmit').innerText = "Tambah";
+                document.getElementById('btnDeleteExp').classList.add('hidden');
                 
-                // Kosongkan form
                 document.getElementById('expId').value = '';
-                document.getElementById('expDate').valueAsDate = new Date(); // Reset ke hari ini
+                document.getElementById('expDate').valueAsDate = new Date();
                 document.getElementById('expDetail').value = '';
                 document.getElementById('expAmount').value = '';
-                // Reset dropdown ke default (optional)
                 document.getElementById('expCategory').selectedIndex = 0;
         
             } else {
@@ -920,7 +919,7 @@
         
             // --- MODE EDIT (Isi Data Lama) ---
             document.getElementById('expenseModalTitle').innerText = "Kemaskini Perbelanjaan";
-            document.getElementById('btnExpSubmit').innerText = "Simpan";
+            document.getElementById('btnExpSubmit').innerText = "Kemaskini";
             
             document.getElementById('expId').value = e.id;
             
@@ -961,7 +960,8 @@
                 // --- UPDATE (Sebab ada ID) ---
                 const { error } = await supabaseClient.from('expenses').update(payload).eq('id', id);
                 if(!error) { 
-                    alert("Belanja dikemaskini!"); 
+                    showSuccessModal("Direkod!", "Perbelanjaan berjaya dikemaskini");
+                    
                     toggleExpenseModal(false); 
                     loadDataFromSupabase(); 
                 } else {
@@ -971,7 +971,8 @@
                 // --- INSERT (Sebab tiada ID) ---
                 const { error } = await supabaseClient.from('expenses').insert([payload]);
                 if(!error) { 
-                    alert("Belanja direkod!"); 
+                    showSuccessModal("Berjaya!", "Perbelanjaan berjaya ditambah");
+                    
                     toggleExpenseModal(false); 
                     loadDataFromSupabase(); 
                 } else {
@@ -980,29 +981,45 @@
             }
         }
         
-        async function deleteExpense() {
+        function deleteExpense() {
             const id = document.getElementById('expId').value;
-            if(!confirm("Padam rekod belanja ini?")) return;
             
-            const { error } = await supabaseClient.from('expenses').delete().eq('id', id);
-            if(!error) { alert("Padam berjaya!"); toggleExpenseModal(false); loadDataFromSupabase(); }
+            if (!id) {
+                console.log("Tiada ID untuk dipadam.");
+                return;
+            }
+        
+            showConfirmationModal(
+                "Adakah anda pasti mahu memadam rekod perbelanjaan ini?", 
+                async () => {
+                    const { error } = await supabaseClient
+                        .from('expenses')
+                        .delete()
+                        .eq('id', id);
+        
+                    if(!error) { 
+                        showSuccessModal("Selesai!", "Rekod telah dipadam.");
+                        toggleExpenseModal(false); 
+                        loadDataFromSupabase(); 
+                    } else {
+                        alert("Gagal memadam: " + error.message);
+                    }
+                }
+            );
         }
 
-        // --- AUTO LOGOUT (AFK 5 MINIT) ---
-        
         let afkTimer;
-        const AFK_LIMIT = 5 * 60 * 1000; // 5 Minit dalam milisaat
+        const AFK_LIMIT = 5 * 60 * 1000; 
         
         function startAutoLogoutTimer() {
-            // Senarai aktiviti yang akan reset timer
             window.onload = resetAfkTimer;
             document.onmousemove = resetAfkTimer;
             document.onkeypress = resetAfkTimer;
-            document.ontouchstart = resetAfkTimer; // Untuk mobile (penting!)
+            document.ontouchstart = resetAfkTimer; 
             document.onclick = resetAfkTimer;
             document.onscroll = resetAfkTimer;
         
-            resetAfkTimer(); // Mula kira
+            resetAfkTimer(); 
         }
         
         function stopAutoLogoutTimer() {
@@ -1010,7 +1027,6 @@
         }
         
         function resetAfkTimer() {
-            // Hanya jalankan timer kalau user adalah Admin
             if (!isAdmin) return;
         
             clearTimeout(afkTimer);
@@ -1018,16 +1034,80 @@
             afkTimer = setTimeout(async () => {
                 console.log("Auto-logout triggered due to inactivity.");
                 
-                // Panggil fungsi logout sedia ada
                 await handleLogout();
                 
-                // Ubah mesej modal success supaya user tahu kenapa dia logout
                 const modal = document.getElementById('logoutSuccessModal');
                 const title = modal.querySelector('h3');
                 const desc = modal.querySelector('p');
                 
                 if(title) title.innerText = "Sesi Tamat";
-                if(desc) desc.innerText = "Anda telah dilog keluar automatik kerana tidak aktif selama 5 minit.";
+                if(desc) desc.innerText = "Anda telah dilog keluar kerana tidak aktif";
         
             }, AFK_LIMIT);
+        }
+
+        function showSuccessModal(title, message) {
+            const modal = document.getElementById('genericSuccessModal');
+            const content = modal.querySelector('div');
+            
+            document.getElementById('genSuccessTitle').innerText = title;
+            document.getElementById('genSuccessDesc').innerText = message;
+        
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+            
+            setTimeout(() => closeGenericSuccessModal(), 2000);
+        }
+        
+        function closeGenericSuccessModal() {
+            const modal = document.getElementById('genericSuccessModal');
+            const content = modal.querySelector('div');
+            
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+
+        let pendingAction = null;
+        
+        function showConfirmationModal(message, actionCallback) {
+            const modal = document.getElementById('confirmationModal');
+            const content = modal.querySelector('div');
+            
+            document.getElementById('confirmMessage').innerText = message;
+            
+            pendingAction = actionCallback;
+        
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+        
+        function closeConfirmationModal() {
+            const modal = document.getElementById('confirmationModal');
+            const content = modal.querySelector('div');
+            
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => { 
+                modal.classList.add('hidden'); 
+                pendingAction = null;
+            }, 300);
+        }
+        
+        async function executeConfirmAction() {
+            if (pendingAction) {
+                await pendingAction();
+            }
+            closeConfirmationModal();
         }
