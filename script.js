@@ -1027,7 +1027,6 @@
             showConfirmationModal(
                 "Adakah anda pasti mahu memadam rekod bayaran ini?",
                 async () => {
-
                     const m = members.find(x => x.id === memberId);
                     if (!m) return;
         
@@ -1035,7 +1034,6 @@
                     const amountToRemove = parseFloat(currentHistory[index].amount);
         
                     currentHistory.splice(index, 1);
-        
                     const newPaid = parseFloat(m.paid) - amountToRemove;
         
                     const { error } = await supabaseClient
@@ -1044,17 +1042,11 @@
                         .eq('id', memberId);
         
                     if (!error) {
-                        showSuccessModal("Berjaya", "Rekod bayaran dipadam.");
+                        showSuccessModal("Selesai", "Rekod bayaran dipadam.");
+        
+                        toggleMemberConfigModal(false); 
         
                         await loadDataFromSupabase(); 
-        
-                        const updatedMember = members.find(x => x.id === memberId);
-                        if (updatedMember) {
-                            renderMemberHistoryInModal(updatedMember);
-                            
-                            cancelHistoryEdit(); 
-                        }
-        
                     } else {
                         alert("Gagal: " + error.message);
                     }
