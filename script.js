@@ -130,8 +130,11 @@
                 modal.classList.remove('opacity-0');
                 content.classList.remove('scale-95');
                 content.classList.add('scale-100');
-            }, 10);
-        }
+                    }, 10);
+                
+                    // --- Pilihan ---
+                    setTimeout(() => closeLogoutSuccessModal(), 3000);
+                }
         
         function closeLogoutSuccessModal() {
             const modal = document.getElementById('logoutSuccessModal');
@@ -143,6 +146,30 @@
             setTimeout(() => { modal.classList.add('hidden'); }, 300);
         }
         
+        function openLoginSuccessModal() {
+            const modal = document.getElementById('loginSuccessModal');
+            const content = modal.querySelector('div');
+        
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        
+            // Auto tutup selepas 2 saat (Pilihan)
+            setTimeout(() => closeLoginSuccessModal(), 3000);
+        }
+        
+        function closeLoginSuccessModal() {
+            const modal = document.getElementById('loginSuccessModal');
+            const content = modal.querySelector('div');
+        
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
         
         // --- PROSES LOGIN & LOGOUT ---
         
@@ -175,8 +202,10 @@
                 // Berjaya Login
                 isAdmin = true;
                 closeLoginModal();
+            
+                openLoginSuccessModal(); // <--- TAMBAH BARIS INI
+            
                 updateAdminUI();
-                
                 startAutoLogoutTimer();
                 btn.innerHTML = 'Log Masuk <i class="fa-solid fa-arrow-right"></i>';
                 btn.disabled = false;
@@ -200,7 +229,7 @@
                 // Reset mesej modal ke asal (sebab auto-logout mungkin dah ubah teks ni)
                 const modal = document.getElementById('logoutSuccessModal');
                 modal.querySelector('h3').innerText = "Berjaya Log Keluar!";
-                modal.querySelector('p').innerText = "Sesi admin anda telah ditamatkan dengan selamat.";
+                modal.querySelector('p').innerText = "Sesi anda telah ditamatkan";
                 
                 openLogoutSuccessModal(); 
             }
