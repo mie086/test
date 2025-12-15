@@ -46,11 +46,8 @@
         
             await loadDataFromSupabase(); 
         
-            // --- MULA: KOD AUTH BARU (GANTIKAN DI SINI) ---
-            // Fungsi ini akan berjalan automatik setiap kali user Login atau Logout
             supabaseClient.auth.onAuthStateChange((event, session) => {
                 
-                // Jika session wujud, isAdmin jadi true. Jika null, jadi false.
                 isAdmin = !!session; 
                 
                 updateAdminUI(); // Terus update butang (tunjuk/sorok)
@@ -63,9 +60,7 @@
                     stopAutoLogoutTimer();
                 }
             });
-            // --- TAMAT: KOD AUTH BARU ---
-            
-            // Kod Toast (kekal sama)
+
             setTimeout(() => {
                 const toast = document.getElementById('paymentToast');
                 if(toast) {
@@ -174,11 +169,9 @@
             const btn = document.getElementById('btnLoginSubmit');
             const errorMsg = document.getElementById('loginErrorMsg');
         
-            // --- LOGIK BLOKER (MULA) ---
             const MAX_ATTEMPTS = 3;
             const BLOCK_DURATION = 60 * 1000; // 60 saat (1 minit)
         
-            // Periksa jika pengguna sedang diblock
             const blockUntil = localStorage.getItem('loginBlockUntil');
             if (blockUntil) {
                 const timeLeft = parseInt(blockUntil) - Date.now();
@@ -190,22 +183,18 @@
                     errorMsg.classList.replace('bg-red-50', 'bg-orange-50');
                     return; // Hentikan fungsi di sini
                 } else {
-                    // Masa block dah tamat, reset storage
                     localStorage.removeItem('loginBlockUntil');
                     localStorage.removeItem('loginAttempts');
                 }
             }
             // --- LOGIK BLOKER (TAMAT) ---
         
-            // UI Loading
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
             btn.disabled = true;
             errorMsg.classList.add('hidden');
-            // Reset warna error kepada merah (jika sebelum ini oren)
             errorMsg.classList.replace('text-orange-600', 'text-red-500');
             errorMsg.classList.replace('bg-orange-50', 'bg-red-50');
         
-            // Cuba Login ke Supabase
             const { data, error } = await supabaseClient.auth.signInWithPassword({
                 email: email,
                 password: password,
@@ -214,14 +203,12 @@
             if (error) {
                 console.error("Login Error:", error);
                 
-                // --- KIRA PERCUBAAN GAGAL (MULA) ---
                 let attempts = parseInt(localStorage.getItem('loginAttempts') || '0') + 1;
                 localStorage.setItem('loginAttempts', attempts);
         
                 let msg = "Email atau password salah.";
         
                 if (attempts >= MAX_ATTEMPTS) {
-                    // Set masa block
                     const releaseTime = Date.now() + BLOCK_DURATION;
                     localStorage.setItem('loginBlockUntil', releaseTime);
                     msg = `Terlalu banyak percubaan! <br>Sila tunggu 1 minit.`;
@@ -229,26 +216,19 @@
                     const left = MAX_ATTEMPTS - attempts;
                     msg = `Salah. Tinggal <b>${left}</b> kali percubaan lagi.`;
                 }
-                // --- KIRA PERCUBAAN GAGAL (TAMAT) ---
-        
+
                 btn.innerHTML = 'Log Masuk <i class="fa-solid fa-arrow-right"></i>';
                 btn.disabled = false;
                 errorMsg.innerHTML = msg;
                 errorMsg.classList.remove('hidden');
         
             } else {
-                // BERJAYA LOG IN
-                // Reset semua rekod percubaan sebab dah berjaya
                 localStorage.removeItem('loginAttempts');
                 localStorage.removeItem('loginBlockUntil');
         
-                // Note: Kita tak perlu set isAdmin = true di sini lagi 
-                // sebab listener 'onAuthStateChange' (yang kita buat tadi) akan uruskan.
-                
                 closeLoginModal();
                 openLoginSuccessModal();
                 
-                // Reset Form
                 btn.innerHTML = 'Log Masuk <i class="fa-solid fa-arrow-right"></i>';
                 btn.disabled = false;
                 document.getElementById('adminEmail').value = '';
@@ -458,21 +438,18 @@
         function formatCurrency(num) { 
             const val = parseFloat(num); // Pastikan ia nombor
             
-            // Semak jika ia nombor bulat (contoh: 50.00 dikira integer)
             const isWhole = Number.isInteger(val);
         
             return val.toLocaleString('ms-MY', { 
                 style: 'currency', 
                 currency: 'MYR',
-                // Logik: Jika nombor bulat, guna 0 digit. Jika tidak, guna 2 digit.
                 minimumFractionDigits: isWhole ? 0 : 2,
                 maximumFractionDigits: isWhole ? 0 : 2
             }); 
         }
         function renderTable() {
             const tbody = document.getElementById('memberTableBody');
-            // Hapus baris ini: tbody.innerHTML = ''; (Kita akan override di hujung nanti)
-        
+
             const targetDisplay = document.getElementById('totalTargetDisplay');
             if (targetDisplay) {
                 targetDisplay.innerText = formatCurrency(FIXED_TARGET);
@@ -481,7 +458,6 @@
             const sortedMembers = [...members].sort((a,b) => b.paid - a.paid);
             let totalCollected = 0;
             
-            // 1. Buat satu variable kosong untuk kumpul HTML
             let htmlContent = ''; 
             
             sortedMembers.forEach(m => {
@@ -495,7 +471,6 @@
                     adminBtn = `<i onclick="editMemberConfig(${m.id})" class="fa-solid fa-pen-to-square text-[10px] ml-2 text-gray-300 hover:text-blue-500 cursor-pointer" title="Urus Ahli"></i>`;
                 }
         
-                // 2. Jangan guna tbody.innerHTML +=, tapi guna htmlContent +=
                 htmlContent += `
                     <tr class="border-b border-gray-50 hover:bg-gray-50">
                         <td class="p-3 font-bold text-gray-700 flex items-center">
@@ -516,7 +491,6 @@
                     </tr>`;
             });
         
-            // 3. Masukkan ke DOM sekali sahaja! (Pantas 🚀)
             tbody.innerHTML = htmlContent;
         
             document.getElementById('tableSummaryCollected').innerText = formatCurrency(totalCollected);
@@ -558,13 +532,15 @@
 
         function renderExpenses() {
             const tbody = document.getElementById('expensesTableBody');
-            // Hapus tbody.innerHTML = '';
-            
+            // Kita tak perlu tbody.innerHTML = '' di sini sebab kita akan override di bawah
+        
+            // Sembunyikan/Tunjuk mesej "Tiada rekod"
             document.getElementById('noExpensesMsg').className = expenses.length === 0 ? "p-6 text-center text-gray-400 text-sm" : "hidden";
         
+            // Susun tarikh terkini di atas
             const sortedExpenses = [...expenses].sort((a,b) => parseMYDate(b.date) - parseMYDate(a.date));
         
-            // 1. Variable pengumpul
+            // Variable pengumpul HTML (Teknik Optimasi)
             let htmlContent = '';
         
             sortedExpenses.forEach(e => {
@@ -580,7 +556,30 @@
                     </button>`;
                 }
         
-                // 2. Kumpul dalam variable
+                // --- MULA: Logik Ikon Resit (Kod Baru Anda) ---
+                let receiptIcon = '';
+        
+                // Cek jika ada URL (Tak kisah dari GitHub atau Supabase)
+                if (e.receipt_url && e.receipt_url.trim() !== "") {
+                    // SITUASI 1: Ada Resit -> Icon Biru -> Buka Gambar
+                    receiptIcon = `
+                        <div onclick="viewReceipt('${e.receipt_url}')" class="mt-1 inline-flex items-center gap-1 cursor-pointer text-blue-500 hover:text-blue-700 transition group">
+                            <i class="fa-solid fa-receipt text-lg group-hover:scale-110 transition-transform"></i>
+                            <span class="text-[9px] font-medium underline decoration-dotted">Lihat Resit</span>
+                        </div>
+                    `;
+                } else {
+                    // SITUASI 2: Tiada Resit -> Icon Kelabu -> Popup "Akan Dikemaskini"
+                    receiptIcon = `
+                        <div onclick="showNoReceiptModal()" class="mt-1 inline-flex items-center gap-1 cursor-pointer text-gray-400 hover:text-gray-600 transition group">
+                            <i class="fa-solid fa-file-dashed-line text-lg group-hover:scale-110 transition-transform"></i>
+                            <span class="text-[9px] font-medium italic">Tiada Resit</span>
+                        </div>
+                    `;
+                }
+                // --- TAMAT: Logik Ikon Resit ---
+        
+                // Masukkan baris HTML ke dalam variable htmlContent
                 htmlContent += `
                     <tr class="border-b border-gray-50 hover:bg-gray-50">
                         <td class="p-3 align-top text-gray-500 whitespace-nowrap">
@@ -592,13 +591,18 @@
                             </div>
                             <div class="text-[10px] text-gray-400">&bull; ${safeDetail}</div>
                         </td>
-                        <td class="p-3 text-right font-bold text-red-500">-${formatCurrency(e.amount)}</td>
+                        <td class="p-3 text-right align-top">
+                            <div class="font-bold text-red-500">-${formatCurrency(e.amount)}</div>
+                            
+                            ${receiptIcon}
+                        </td>
                     </tr>`;
             });
             
-            // 3. Render sekali harung
+            // Render semua sekali gus ke skrin
             tbody.innerHTML = htmlContent;
         
+            // Update ringkasan kewangan di atas
             updateExpensesSummary(members.reduce((sum, m) => sum + m.paid, 0)); 
         }
         function updateExpensesSummary(totalCollected) {
@@ -639,11 +643,11 @@
             const icon = element.querySelector('.fa-chevron-down');
         
             if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden'); // Buka
-                icon.classList.add('rotate-180');   // Pusing panah ke atas
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
             } else {
-                content.classList.add('hidden');    // Tutup
-                icon.classList.remove('rotate-180');// Pusing panah ke bawah
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
             }
         }
 
@@ -946,7 +950,9 @@
             document.getElementById('expDetail').value = e.detail;
             document.getElementById('expAmount').value = e.amount;
             
-            document.getElementById('btnDeleteExp').classList.remove('hidden'); // Tunjuk butang delete!
+            document.getElementById('expReceiptUrl').value = e.receipt_url || '';
+            
+            document.getElementById('btnDeleteExp').classList.remove('hidden');
         }
         
         async function submitExpense(e) {
@@ -957,6 +963,8 @@
             const detail = document.getElementById('expDetail').value;
             const amount = parseFloat(document.getElementById('expAmount').value);
         
+            const receiptUrl = document.getElementById('expReceiptUrl').value;
+        
             const d = new Date(dateInput);
             const day = d.getDate().toString().padStart(2, '0');   // 2 -> 02
             const month = (d.getMonth() + 1).toString().padStart(2, '0'); // 1 -> 01
@@ -964,7 +972,7 @@
             
             const dateStr = `${day}-${month}-${year}`;
         
-            const payload = { date: dateStr, category, detail, amount };
+            const payload = { date: dateStr, category, detail, amount, receipt_url: receiptUrl };
         
             if (id) {
                 const { error } = await supabaseClient.from('expenses').update(payload).eq('id', id);
@@ -1020,9 +1028,6 @@
         const AFK_LIMIT = 3 * 60 * 1000;
         
         function startAutoLogoutTimer() {
-            // Kita guna senarai event yang penting sahaja.
-            // 'mousemove' dibuang untuk elak lag.
-            // { passive: true } menjadikan scroll lebih lancar di mobile.
             const events = ['click', 'keypress', 'touchstart', 'scroll'];
             
             events.forEach(evt => {
@@ -1035,8 +1040,6 @@
         function stopAutoLogoutTimer() {
             clearTimeout(afkTimer);
             
-            // Kita perlu "bersihkan" event listener bila user logout
-            // Supaya browser tak terus memantau walaupun dah tak perlu
             const events = ['click', 'keypress', 'touchstart', 'scroll'];
             
             events.forEach(evt => {
@@ -1167,7 +1170,6 @@
             const content = modal.querySelector('div');
             
             modal.classList.remove('hidden');
-            // Animasi masuk
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 content.classList.remove('scale-95');
@@ -1179,15 +1181,12 @@
             const modal = document.getElementById('databaseErrorModal');
             const content = modal.querySelector('div');
             
-            // Animasi keluar
             modal.classList.add('opacity-0');
             content.classList.remove('scale-100');
             content.classList.add('scale-95');
             
             setTimeout(() => { 
                 modal.classList.add('hidden'); 
-                // Optional: Reload page jika perlu reset sambungan
-                // location.reload(); 
             }, 300);
         }
 
@@ -1207,7 +1206,6 @@
             const modal = document.getElementById('afkLogoutModal');
             const content = modal.querySelector('div');
         
-            // Animasi keluar
             modal.classList.add('opacity-0');
             content.classList.remove('scale-100');
             content.classList.add('scale-95');
@@ -1224,11 +1222,61 @@
                 const currentVal = parseFloat(event.target.value) || 0;
                 const adjustment = event.key === 'ArrowUp' ? 10 : -10;
                 
-                // Kira nilai baru (elak negatif)
                 const newVal = Math.max(0, currentVal + adjustment);
                 
-                // Papar dengan 2 titik perpuluhan (contoh: 10.50 -> 20.50)
-                // Jika mahu nombor bulat sahaja bila arrow ditekan, buang .toFixed(2)
                 event.target.value = newVal.toFixed(2); 
+            }
+        }
+
+        function showNoReceiptModal() {
+            const modal = document.getElementById('noReceiptModal');
+            const content = modal.querySelector('div');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+        
+        function closeNoReceiptModal() {
+            const modal = document.getElementById('noReceiptModal');
+            const content = modal.querySelector('div');
+            
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        function viewReceipt(url) {
+            const modal = document.getElementById('receiptImageModal');
+            const img = document.getElementById('receiptImageDisplay');
+            
+            // Jika modal html tak jumpa, dia akan stop (elak error console)
+            if (!modal || !img) {
+                console.error("Error: Modal 'receiptImageModal' tidak dijumpai dalam HTML.");
+                return;
+            }
+        
+            img.src = url; // Set gambar dari URL
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+            }, 10);
+        }
+        
+        function closeReceiptModal() {
+            const modal = document.getElementById('receiptImageModal');
+            const img = document.getElementById('receiptImageDisplay');
+            
+            if (modal) {
+                modal.classList.add('opacity-0');
+                setTimeout(() => { 
+                    modal.classList.add('hidden'); 
+                    if(img) img.src = ''; // Kosongkan gambar bila tutup
+                }, 300);
             }
         }
