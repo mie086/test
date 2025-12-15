@@ -1216,3 +1216,19 @@
                 modal.classList.add('hidden'); 
             }, 300);
         }
+
+        function jumpTen(event) {
+            if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+                event.preventDefault(); // Halang behavior asal (naik 0.01)
+                
+                const currentVal = parseFloat(event.target.value) || 0;
+                const adjustment = event.key === 'ArrowUp' ? 10 : -10;
+                
+                // Kira nilai baru (elak negatif)
+                const newVal = Math.max(0, currentVal + adjustment);
+                
+                // Papar dengan 2 titik perpuluhan (contoh: 10.50 -> 20.50)
+                // Jika mahu nombor bulat sahaja bila arrow ditekan, buang .toFixed(2)
+                event.target.value = newVal.toFixed(2); 
+            }
+        }
