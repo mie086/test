@@ -51,7 +51,7 @@
                 
                 isAdmin = !!session; 
                 
-                updateAdminUI(); // Terus update butang (tunjuk/sorok)
+                updateAdminUI();
                 
                 if (isAdmin) {
                     console.log("Admin dikesan. Timer bermula.");
@@ -511,6 +511,9 @@
         function openDetails(id) {
             const m = members.find(x => x.id === id);
             document.getElementById('detailMemberName').innerText = m.name;
+            
+            lockScroll();
+            
             const tbody = document.getElementById('detailsTableBody');
             tbody.innerHTML = '';
         
@@ -530,7 +533,10 @@
             document.getElementById('detailTotal').innerText = formatCurrency(m.paid);
             document.getElementById('detailsModal').classList.remove('hidden');
         }
-        function closeDetailsModal() { document.getElementById('detailsModal').classList.add('hidden'); }
+        function closeDetailsModal() { 
+            unlockScroll(); 
+            document.getElementById('detailsModal').classList.add('hidden'); 
+        }
 
         function renderExpenses() {
             const tbody = document.getElementById('expensesTableBody');
@@ -646,6 +652,7 @@
             const content = modal.querySelector('div');
             
             if(show) {
+                lockScroll();
                 modal.classList.remove('hidden');
                 setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.add('scale-100'); }, 10);
                 
@@ -656,12 +663,13 @@
                 document.getElementById('configMemberId').value = '';
                 document.getElementById('configMemberName').value = '';
                 
-                cancelHistoryEdit(); // Reset kotak hijau
+                cancelHistoryEdit();
         
                 document.getElementById('btnDeleteMember').classList.add('hidden');
                 document.getElementById('memberHistorySection').classList.add('hidden');
         
             } else {
+                unlockScroll();
                 modal.classList.add('opacity-0');
                 content.classList.remove('scale-100');
                 setTimeout(() => modal.classList.add('hidden'), 300);
@@ -895,6 +903,7 @@
             const content = modal.querySelector('div');
             
             if(show) {
+                lockScroll();
                 modal.classList.remove('hidden');
                 setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.add('scale-100'); }, 10);
                 
@@ -909,6 +918,7 @@
                 document.getElementById('expCategory').selectedIndex = 0;
         
             } else {
+                unlockScroll();
                 modal.classList.add('opacity-0');
                 content.classList.remove('scale-100');
                 setTimeout(() => { modal.classList.add('hidden'); }, 300);
@@ -921,6 +931,9 @@
         
             const modal = document.getElementById('expenseModal');
             const content = modal.querySelector('div');
+            
+            lockScroll();
+            
             modal.classList.remove('hidden');
             setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.add('scale-100'); }, 10);
         
@@ -1205,7 +1218,7 @@
 
         function jumpTen(event) {
             if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-                event.preventDefault(); // Halang behavior asal (naik 0.01)
+                event.preventDefault();
                 
                 const currentVal = parseFloat(event.target.value) || 0;
                 const adjustment = event.key === 'ArrowUp' ? 10 : -10;
@@ -1220,6 +1233,8 @@
             const modal = document.getElementById('noReceiptModal');
             const content = modal.querySelector('div');
             
+            lockScroll();
+            
             modal.classList.remove('hidden');
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
@@ -1231,6 +1246,8 @@
         function closeNoReceiptModal() {
             const modal = document.getElementById('noReceiptModal');
             const content = modal.querySelector('div');
+            
+            unlockScroll();
             
             modal.classList.add('opacity-0');
             content.classList.remove('scale-100');
@@ -1249,6 +1266,8 @@
         
             img.src = url;
             
+            lockScroll();
+            
             modal.classList.remove('hidden');
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
@@ -1260,10 +1279,19 @@
             const img = document.getElementById('receiptImageDisplay');
             
             if (modal) {
+                unlockScroll();
                 modal.classList.add('opacity-0');
                 setTimeout(() => { 
                     modal.classList.add('hidden'); 
                     if(img) img.src = '';
                 }, 300);
             }
+        }
+
+        function lockScroll() {
+            document.body.classList.add('overflow-hidden');
+        }
+        
+        function unlockScroll() {
+            document.body.classList.remove('overflow-hidden');
         }
