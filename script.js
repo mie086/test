@@ -588,10 +588,8 @@
                     </tr>`;
             });
             
-            // Render semua sekali gus ke skrin
             tbody.innerHTML = htmlContent;
         
-            // Update ringkasan kewangan di atas
             updateExpensesSummary(members.reduce((sum, m) => sum + m.paid, 0)); 
         }
         function updateExpensesSummary(totalCollected) {
@@ -750,7 +748,6 @@
             const id = document.getElementById('configMemberId').value;
             const name = document.getElementById('configMemberName').value;
             
-            // Tukar kepada Float, jika NaN (kosong), ia jadi 0
             const amountVal = parseFloat(document.getElementById('initPayAmount').value) || 0;
             const dateInput = document.getElementById('initPayDate').value; 
             const editIndex = document.getElementById('editHistoryIndex').value;
@@ -1264,7 +1261,7 @@
                 modal.classList.add('opacity-0');
                 setTimeout(() => { 
                     modal.classList.add('hidden'); 
-                    if(img) img.src = ''; // Kosongkan gambar bila tutup
+                    if(img) img.src = '';
                 }, 300);
             }
         }
