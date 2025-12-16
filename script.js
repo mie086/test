@@ -532,15 +532,11 @@
 
         function renderExpenses() {
             const tbody = document.getElementById('expensesTableBody');
-            // Kita tak perlu tbody.innerHTML = '' di sini sebab kita akan override di bawah
-        
-            // Sembunyikan/Tunjuk mesej "Tiada rekod"
+
             document.getElementById('noExpensesMsg').className = expenses.length === 0 ? "p-6 text-center text-gray-400 text-sm" : "hidden";
         
-            // Susun tarikh terkini di atas
             const sortedExpenses = [...expenses].sort((a,b) => parseMYDate(b.date) - parseMYDate(a.date));
         
-            // Variable pengumpul HTML (Teknik Optimasi)
             let htmlContent = '';
         
             sortedExpenses.forEach(e => {
@@ -556,12 +552,9 @@
                     </button>`;
                 }
         
-                // --- MULA: Logik Ikon Resit (Kod Baru Anda) ---
                 let receiptIcon = '';
         
-                // Cek jika ada URL (Tak kisah dari GitHub atau Supabase)
                 if (e.receipt_url && e.receipt_url.trim() !== "") {
-                    // SITUASI 1: Ada Resit -> Icon Biru -> Buka Gambar
                     receiptIcon = `
                         <div onclick="viewReceipt('${e.receipt_url}')" class="mt-1 inline-flex items-center gap-1 cursor-pointer text-blue-500 hover:text-blue-700 transition group">
                             <i class="fa-solid fa-receipt text-lg group-hover:scale-110 transition-transform"></i>
@@ -569,17 +562,13 @@
                         </div>
                     `;
                 } else {
-                    // SITUASI 2: Tiada Resit -> Icon Kelabu -> Popup "Akan Dikemaskini"
                     receiptIcon = `
-                        <div onclick="showNoReceiptModal()" class="mt-1 inline-flex items-center gap-1 cursor-pointer text-gray-400 hover:text-gray-600 transition group">
-                            <i class="fa-solid fa-file-dashed-line text-lg group-hover:scale-110 transition-transform"></i>
-                            <span class="text-[9px] font-medium italic">Tiada Resit</span>
+                        <div onclick="showNoReceiptModal()" class="mt-1 inline-flex items-center gap-1 cursor-pointer text-blue-500 hover:text-blue-700 transition group">
+                            <i class="fa-solid fa-receipt text-lg group-hover:scale-110 transition-transform"></i>
+                            <span class="text-[9px] font-medium underline decoration-dotted">Lihat Resit</span>
                         </div>
                     `;
                 }
-                // --- TAMAT: Logik Ikon Resit ---
-        
-                // Masukkan baris HTML ke dalam variable htmlContent
                 htmlContent += `
                     <tr class="border-b border-gray-50 hover:bg-gray-50">
                         <td class="p-3 align-top text-gray-500 whitespace-nowrap">
@@ -1254,13 +1243,12 @@
             const modal = document.getElementById('receiptImageModal');
             const img = document.getElementById('receiptImageDisplay');
             
-            // Jika modal html tak jumpa, dia akan stop (elak error console)
             if (!modal || !img) {
                 console.error("Error: Modal 'receiptImageModal' tidak dijumpai dalam HTML.");
                 return;
             }
         
-            img.src = url; // Set gambar dari URL
+            img.src = url;
             
             modal.classList.remove('hidden');
             setTimeout(() => {
